@@ -4,20 +4,47 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include <spdlog/spdlog.h>
+
 #include <cstdlib>
-#include <exception>
 #include <iostream>
+#include <stdexcept>
 #include <string_view>
 #include <vector>
 
-static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT /*messageSeverity*/,
-    VkDebugUtilsMessageTypeFlagsEXT /*messageType*/,
-    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-    void* /*pUserData*/)
+static bool debugCallbackCpp(
+    vk::DebugUtilsMessageSeverityFlagBitsEXT severity,
+    vk::DebugUtilsMessageTypeFlagsEXT /*type*/,
+    const vk::DebugUtilsMessengerCallbackDataEXT& cbData,
+    void* /*userdata*/)
 {
-    std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
-    return VK_FALSE;
+    if /*  */ (severity & vk::DebugUtilsMessageSeverityFlagBitsEXT::eError) {
+        spdlog::error(cbData.pMessage);
+    } else if (severity & vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning) {
+        spdlog::warn(cbData.pMessage);
+    } else if (severity & vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo) {
+        spdlog::info(cbData.pMessage);
+    } else if (severity & vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose) {
+        spdlog::debug(cbData.pMessage);
+    }
+    return false;
+}
+
+static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+    VkDebugUtilsMessageTypeFlagsEXT type,
+    const VkDebugUtilsMessengerCallbackDataEXT* cbData,
+    void* userdata)
+{
+    vk::DebugUtilsMessengerCallbackDataEXT callbackData;
+    callbackData = *cbData;
+    return debugCallbackCpp(
+               static_cast<vk::DebugUtilsMessageSeverityFlagBitsEXT>(severity),
+               static_cast<vk::DebugUtilsMessageTypeFlagBitsEXT>(type),
+               callbackData,
+               userdata)
+        ? VK_TRUE
+        : VK_FALSE;
 }
 
 PFN_vkCreateDebugUtilsMessengerEXT pfnVkCreateDebugUtilsMessengerEXT;
@@ -191,7 +218,7 @@ int main()
     try {
         app.run();
     } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        spdlog::error(e.what());
         return EXIT_FAILURE;
     }
 
