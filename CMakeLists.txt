@@ -39,3 +39,22 @@ target_link_libraries(helloworld
         tinyobjloader
         Vulkan::Vulkan
 )
+target_compile_definitions(helloworld
+    PRIVATE
+        VULKAN_HPP_NO_CONSTRUCTORS
+        VULKAN_HPP_NO_TO_STRING
+        GLFW_INCLUDE_NONE
+)
+target_precompile_headers(helloworld
+    PUBLIC
+        <vulkan/vulkan.hpp>
+        <vulkan/vulkan_raii.hpp>
+        <GLFW/glfw3.h>
+        <glm/glm.hpp>
+        <spdlog/spdlog.h>
+        <cstdlib>
+        <stdexcept>
+        <string_view>
+        <vector>
+        <iostream>
+)
