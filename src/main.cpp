@@ -6,13 +6,14 @@ static bool debugCallbackCpp(
     const vk::DebugUtilsMessengerCallbackDataEXT& cbData,
     void* /*userdata*/)
 {
-    if /*  */ (severity & vk::DebugUtilsMessageSeverityFlagBitsEXT::eError) {
+    using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
+    if /*  */ (severity & eError) {
         spdlog::error(cbData.pMessage);
-    } else if (severity & vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning) {
+    } else if (severity & eWarning) {
         spdlog::warn(cbData.pMessage);
-    } else if (severity & vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo) {
+    } else if (severity & eInfo) {
         spdlog::info(cbData.pMessage);
-    } else if (severity & vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose) {
+    } else if (severity & eVerbose) {
         spdlog::debug(cbData.pMessage);
     }
     return false;
