@@ -47,18 +47,20 @@ target_compile_definitions(helloworld
     PRIVATE
         VULKAN_HPP_NO_CONSTRUCTORS
         VULKAN_HPP_NO_TO_STRING
+        VULKAN_HPP_HAS_SPACESHIP_OPERATOR
         GLFW_INCLUDE_NONE
 )
 target_precompile_headers(helloworld
     PUBLIC
         <vulkan/vulkan.hpp>
-        <vulkan/vulkan_raii.hpp>
         <GLFW/glfw3.h>
         <glm/glm.hpp>
         <spdlog/spdlog.h>
+        <algorithm>
         <cstdlib>
+        <iostream>
+        <ranges>
         <stdexcept>
         <string_view>
         <vector>
-        <iostream>
 )
