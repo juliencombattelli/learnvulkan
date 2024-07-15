@@ -64,3 +64,39 @@ target_precompile_headers(helloworld
         <string_view>
         <vector>
 )
+
+add_executable(vulkan-hpp-test src/vulkan-hpp-test.cpp)
+if(CMAKE_CXX_COMPILER_ID MATCHES Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
+    target_compile_options(vulkan-hpp-test
+        PRIVATE
+            -Wall -Wextra -Wconversion -Wshadow -pedantic
+    )
+endif()
+target_link_libraries(vulkan-hpp-test
+    PRIVATE
+        glfw
+        glm::glm
+        imgui
+        shaderc
+        spdlog::spdlog
+        stb
+        tinyobjloader
+        Vulkan::Vulkan
+)
+target_compile_definitions(vulkan-hpp-test
+    PRIVATE
+        VULKAN_HPP_NO_CONSTRUCTORS
+        GLFW_INCLUDE_NONE
+)
+target_precompile_headers(vulkan-hpp-test
+    PUBLIC
+        <vulkan/vulkan.hpp>
+        <GLFW/glfw3.h>
+        <glm/glm.hpp>
+        <spdlog/spdlog.h>
+        <cstdlib>
+        <stdexcept>
+        <string_view>
+        <vector>
+        <iostream>
+)
