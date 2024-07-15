@@ -151,6 +151,11 @@ private:
 
     [[nodiscard]] static vk::DebugUtilsMessengerEXT createDebugMessenger(vk::Instance& instance)
     {
+        pfnVkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
+            instance.getProcAddr("vkCreateDebugUtilsMessengerEXT"));
+        pfnVkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
+            instance.getProcAddr("vkDestroyDebugUtilsMessengerEXT"));
+
         using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
         using enum vk::DebugUtilsMessageTypeFlagBitsEXT;
         vk::DebugUtilsMessengerCreateInfoEXT createInfo {
@@ -165,10 +170,6 @@ private:
     void initVulkan()
     {
         instance = createVkInstance();
-        pfnVkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
-            instance.getProcAddr("vkCreateDebugUtilsMessengerEXT"));
-        pfnVkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
-            instance.getProcAddr("vkDestroyDebugUtilsMessengerEXT"));
         if (enableValidationLayers) {
             debugMessenger = createDebugMessenger(instance);
         }
