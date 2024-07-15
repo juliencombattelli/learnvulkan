@@ -1,13 +1,18 @@
-message(STATUS)
-include(FetchGLFW.cmake)
-message(STATUS)
-include(FetchGLM.cmake)
-message(STATUS)
-include(FetchImGui.cmake)
-message(STATUS)
-include(FetchSpdlog.cmake)
-message(STATUS)
-include(FetchStb.cmake)
-message(STATUS)
-include(FetchTinyObjLoader.cmake)
-message(STATUS)
+function(include_dependencies)
+    set(FILES ${ARGN})
+    message(STATUS)
+    foreach(FILE IN LISTS FILES)
+        include(${FILE})
+        message(STATUS)
+    endforeach()
+endfunction()
+
+include_dependencies(
+    FetchGLFW.cmake
+    FetchGLM.cmake
+    FetchImGui.cmake
+    FetchShaderc.cmake
+    FetchSpdlog.cmake
+    FetchStb.cmake
+    FetchTinyObjLoader.cmake
+)
