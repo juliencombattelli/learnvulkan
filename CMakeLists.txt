@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 project(LearnVulkan VERSION 1.0.0)
 
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "" FORCE)
+endif()
+
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_STANDARD 20)
