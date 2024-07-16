@@ -114,7 +114,7 @@ private:
         return true;
     }
 
-    [[nodiscard]] static vk::Instance createVkInstance()
+    [[nodiscard]] static vk::UniqueInstance createInstanceUnique()
     {
         vk::ApplicationInfo appInfo {
             .pApplicationName = "Hello Triangle",
@@ -142,20 +142,23 @@ private:
             createInfo.ppEnabledLayerNames = requiredValidationLayers.data();
         }
 
-        return vk::createInstance(createInfo);
+        return vk::createInstanceUnique(createInfo);
     }
 
-    [[nodiscard]] static vk::DebugUtilsMessengerEXT createDebugMessenger(vk::Instance& instance)
+    [[nodiscard]] static vk::UniqueDebugUtilsMessengerEXT createDebugMessengerUnique(
+        vk::Instance& instance)
     {
         using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
         using enum vk::DebugUtilsMessageTypeFlagBitsEXT;
+
         vk::DebugUtilsMessengerCreateInfoEXT createInfo {
             .messageSeverity = eVerbose | eInfo | eWarning | eError,
             .messageType = eGeneral | eValidation | ePerformance,
             .pfnUserCallback = debugCallback,
             .pUserData = nullptr,
         };
-        return instance.createDebugUtilsMessengerEXT(createInfo);
+
+        return instance.createDebugUtilsMessengerEXTUnique(createInfo);
     }
 
     [[nodiscard]] static bool areGraphicsAndPresentationCapabilitiesSupported(
@@ -225,13 +228,13 @@ private:
     void initVulkan()
     {
         VULKAN_HPP_DEFAULT_DISPATCHER.init();
-        instance = createVkInstance();
+        instance = createInstanceUnique();
         VULKAN_HPP_DEFAULT_DISPATCHER.init(*instance);
 
         if (enableValidationLayers) {
-            debugMessenger = createDebugMessenger(instance);
+            debugMessenger = createDebugMessengerUnique(*instance);
         }
-        physicalDevice = pickPhysicalDevice(instance);
+        physicalDevice = pickPhysicalDevice(*instance);
     }
 
     void mainLoop()
@@ -252,8 +255,8 @@ private:
     }
 
     GLFWwindow* window;
-    vk::Instance instance;
-    vk::DebugUtilsMessengerEXT debugMessenger;
+    vk::UniqueInstance instance;
+    vk::UniqueDebugUtilsMessengerEXT debugMessenger;
     vk::PhysicalDevice physicalDevice;
 };
 
