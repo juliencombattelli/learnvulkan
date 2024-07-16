@@ -96,7 +96,7 @@ private:
         return extensions;
     }
 
-    [[nodiscard]] static bool areValidationLayersSupported(std::vector<const char*> layers)
+    [[nodiscard]] static bool areValidationLayersSupported(std::span<const char* const> layers)
     {
         auto layerProperties = vk::enumerateInstanceLayerProperties();
         for (std::string_view layer : layers) {
