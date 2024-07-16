@@ -46,25 +46,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
         : VK_FALSE;
 }
 
-PFN_vkCreateDebugUtilsMessengerEXT pfnVkCreateDebugUtilsMessengerEXT;
-PFN_vkDestroyDebugUtilsMessengerEXT pfnVkDestroyDebugUtilsMessengerEXT;
-
-VKAPI_ATTR VkResult VKAPI_CALL vkCreateDebugUtilsMessengerEXT(
-    VkInstance instance,
-    const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-    const VkAllocationCallbacks* pAllocator,
-    VkDebugUtilsMessengerEXT* pMessenger)
-{
-    return pfnVkCreateDebugUtilsMessengerEXT(instance, pCreateInfo, pAllocator, pMessenger);
-}
-
-VKAPI_ATTR void VKAPI_CALL vkDestroyDebugUtilsMessengerEXT(
-    VkInstance instance,
-    VkDebugUtilsMessengerEXT messenger,
-    VkAllocationCallbacks const* pAllocator)
-{
-    return pfnVkDestroyDebugUtilsMessengerEXT(instance, messenger, pAllocator);
-}
+VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE;
 
 class HelloTriangleApplication {
 public:
@@ -165,11 +147,6 @@ private:
 
     [[nodiscard]] static vk::DebugUtilsMessengerEXT createDebugMessenger(vk::Instance& instance)
     {
-        pfnVkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
-            instance.getProcAddr("vkCreateDebugUtilsMessengerEXT"));
-        pfnVkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
-            instance.getProcAddr("vkDestroyDebugUtilsMessengerEXT"));
-
         using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
         using enum vk::DebugUtilsMessageTypeFlagBitsEXT;
         vk::DebugUtilsMessengerCreateInfoEXT createInfo {
@@ -247,7 +224,10 @@ private:
 
     void initVulkan()
     {
+        VULKAN_HPP_DEFAULT_DISPATCHER.init();
         instance = createVkInstance();
+        VULKAN_HPP_DEFAULT_DISPATCHER.init(*instance);
+
         if (enableValidationLayers) {
             debugMessenger = createDebugMessenger(instance);
         }
@@ -263,10 +243,6 @@ private:
 
     void cleanupVulkan()
     {
-        if (enableValidationLayers) {
-            instance.destroyDebugUtilsMessengerEXT(debugMessenger);
-        }
-        instance.destroy();
     }
 
     void cleanupWindow()
