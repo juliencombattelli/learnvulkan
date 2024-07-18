@@ -166,12 +166,18 @@ private:
     [[nodiscard]] static vk::UniqueDebugUtilsMessengerEXT createDebugMessengerUnique(
         vk::Instance& instance)
     {
-        using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
-        using enum vk::DebugUtilsMessageTypeFlagBitsEXT;
 
         vk::DebugUtilsMessengerCreateInfoEXT createInfo {
-            .messageSeverity = eVerbose | eInfo | eWarning | eError,
-            .messageType = eGeneral | eValidation | ePerformance,
+            .messageSeverity =
+                []() {
+                    using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
+                    return eVerbose | eInfo | eWarning | eError;
+                }(),
+            .messageType =
+                []() {
+                    using enum vk::DebugUtilsMessageTypeFlagBitsEXT;
+                    return eGeneral | eValidation | ePerformance;
+                }(),
             .pfnUserCallback = debugCallback,
             .pUserData = nullptr,
         };
