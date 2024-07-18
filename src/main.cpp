@@ -7,12 +7,7 @@ static void glfwErrorCallback(int errorCode, const char* description)
     spdlog::error("GLFW error {}: {}", errorCode, description);
 }
 
-static void glfwKeyCallback(
-    GLFWwindow* window,
-    int key,
-    [[maybe_unused]] int scancode,
-    int action,
-    [[maybe_unused]] int mods)
+static void glfwKeyCallback(GLFWwindow* window, int key, int /*scancode*/, int action, int /*mods*/)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
