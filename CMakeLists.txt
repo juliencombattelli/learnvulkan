@@ -46,7 +46,6 @@ target_link_libraries(helloworld
 target_compile_definitions(helloworld
     PRIVATE
         VULKAN_HPP_NO_CONSTRUCTORS
-        VULKAN_HPP_NO_TO_STRING
         VULKAN_HPP_HAS_SPACESHIP_OPERATOR
         VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1
         GLFW_INCLUDE_NONE

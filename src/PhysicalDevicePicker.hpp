@@ -1,16 +1,5 @@
 #pragma once
 
-#include "spdlog/spdlog.h"
-#include <initializer_list>
-#include <optional>
-#include <vulkan/vulkan_enums.hpp>
-#include <vulkan/vulkan_handles.hpp>
-
-#include <algorithm>
-#include <map>
-#include <ranges>
-#include <string_view>
-
 struct PhysicalDevicePickResult {
     vk::PhysicalDevice physicalDevice;
     uint32_t graphicsQueueFamilyIndex;
@@ -35,12 +24,17 @@ public:
             }
         }
 
+        if (compatiblePhysicalDevices.empty()) {
+            std::runtime_error("No compatible physical device found");
+        }
+
         std::ranges::sort(compatiblePhysicalDevices, compareDevicesByPreference);
         PhysicalDevicePickResult& preferedPhysicalDevices = compatiblePhysicalDevices.front();
 
         return preferedPhysicalDevices;
     }
 
+private:
     [[nodiscard]] static bool compareDevicesByPreference(
         const PhysicalDevicePickResult& device1,
         const PhysicalDevicePickResult& device2)
