@@ -1,9 +1,10 @@
 // Based on https://github.com/dokipen3d/vulkanHppMinimalExample
 
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
+#include "glfw.hpp"
+#include "glm.hpp"
+#include "vulkan.hpp"
+
 #include <shaderc/shaderc.hpp>
-#include <vulkan/vulkan.hpp>
 
 #include <algorithm>
 #include <array>

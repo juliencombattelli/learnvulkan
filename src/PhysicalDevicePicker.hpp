@@ -1,5 +1,8 @@
 #pragma once
 
+#include "spdlog.hpp"
+#include "vulkan.hpp" // IWYU pragma: keep; FIXME don't know why clangd is complaining here
+
 struct PhysicalDevicePickResult {
     vk::PhysicalDevice physicalDevice;
     uint32_t graphicsQueueFamilyIndex;

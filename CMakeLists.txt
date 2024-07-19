@@ -26,6 +26,23 @@ find_package(spdlog CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
 find_package(Vulkan REQUIRED)
 
+add_library(pch INTERFACE)
+target_include_directories(pch INTERFACE src/pch)
+target_precompile_headers(pch
+    INTERFACE
+        src/pch/glfw.hpp
+        src/pch/glm.hpp
+        src/pch/spdlog.hpp
+        src/pch/vulkan.hpp
+)
+target_link_libraries(pch
+    INTERFACE
+        glfw
+        glm::glm
+        spdlog::spdlog
+        Vulkan::Vulkan
+)
+
 add_executable(helloworld src/main.cpp)
 if(CMAKE_CXX_COMPILER_ID MATCHES Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
     target_compile_options(helloworld
@@ -35,34 +52,10 @@ if(CMAKE_CXX_COMPILER_ID MATCHES Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
 endif()
 target_link_libraries(helloworld
     PRIVATE
-        glfw
-        glm::glm
         imgui
-        spdlog::spdlog
         stb
         tinyobjloader
-        Vulkan::Vulkan
-)
-target_compile_definitions(helloworld
-    PRIVATE
-        VULKAN_HPP_NO_CONSTRUCTORS
-        VULKAN_HPP_HAS_SPACESHIP_OPERATOR
-        VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1
-        GLFW_INCLUDE_NONE
-)
-target_precompile_headers(helloworld
-    PUBLIC
-        <vulkan/vulkan.hpp>
-        <GLFW/glfw3.h>
-        <glm/glm.hpp>
-        <spdlog/spdlog.h>
-        <algorithm>
-        <cstdlib>
-        <iostream>
-        <ranges>
-        <stdexcept>
-        <string_view>
-        <vector>
+        pch
 )
 
 add_executable(vulkan-hpp-test src/vulkan-hpp-test.cpp)
@@ -74,29 +67,9 @@ if(CMAKE_CXX_COMPILER_ID MATCHES Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
 endif()
 target_link_libraries(vulkan-hpp-test
     PRIVATE
-        glfw
-        glm::glm
         imgui
         shaderc
-        spdlog::spdlog
         stb
         tinyobjloader
-        Vulkan::Vulkan
-)
-target_compile_definitions(vulkan-hpp-test
-    PRIVATE
-        VULKAN_HPP_NO_CONSTRUCTORS
-        GLFW_INCLUDE_NONE
-)
-target_precompile_headers(vulkan-hpp-test
-    PUBLIC
-        <vulkan/vulkan.hpp>
-        <GLFW/glfw3.h>
-        <glm/glm.hpp>
-        <spdlog/spdlog.h>
-        <cstdlib>
-        <stdexcept>
-        <string_view>
-        <vector>
-        <iostream>
+        pch
 )
