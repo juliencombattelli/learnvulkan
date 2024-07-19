@@ -7,8 +7,7 @@ message(CHECK_START "Fetching and configuring Stb @ 013ac3be")
 FetchContent_Declare(
     stb
     GIT_REPOSITORY https://github.com/nothings/stb
-    GIT_TAG 013ac3be
-    GIT_SHALLOW ON
+    GIT_TAG 013ac3beddff3dbffafd5177e7972067cd2b5083
 )
 FetchContent_MakeAvailable(stb)
 message(CHECK_PASS "done")
