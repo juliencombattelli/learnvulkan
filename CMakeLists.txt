@@ -5,6 +5,8 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "" FORCE)
 endif()
 
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_STANDARD 20)
@@ -22,10 +24,29 @@ add_subdirectory(cmake/Dependencies)
 
 find_package(glfw 3.4 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
-find_package(Vulkan REQUIRED)
+find_package(Vulkan 1.3.264 REQUIRED) # Full dynamic loading using the DispatchLoaderDynamic
 
+message(STATUS "Found vulkan ${Vulkan_VERSION}")
+message(STATUS "Vulkan include directories: ${Vulkan_INCLUDE_DIRS}")
+
+# Build ImGui
+add_library(imgui
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_vulkan.cpp
+)
+target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
+target_link_libraries(imgui
+    PUBLIC
+        Vulkan::Headers
+)
+
+# Build precompiled headers
 add_library(pch INTERFACE)
 target_include_directories(pch INTERFACE src/pch)
 target_precompile_headers(pch
@@ -40,9 +61,10 @@ target_link_libraries(pch
         glfw
         glm::glm
         spdlog::spdlog
-        Vulkan::Vulkan
+        Vulkan::Headers # Currently vulkan is loaded dynamically by the application
 )
 
+# Build main application
 add_executable(helloworld src/main.cpp)
 if(CMAKE_CXX_COMPILER_ID MATCHES Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
     target_compile_options(helloworld
@@ -58,6 +80,7 @@ target_link_libraries(helloworld
         pch
 )
 
+# Build sample application
 add_executable(vulkan-hpp-test src/vulkan-hpp-test.cpp)
 if(CMAKE_CXX_COMPILER_ID MATCHES Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
     target_compile_options(vulkan-hpp-test

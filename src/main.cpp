@@ -201,7 +201,9 @@ private:
     void initVulkan()
     {
         VULKAN_HPP_DEFAULT_DISPATCHER.init();
+
         instance = createInstanceUnique();
+
         VULKAN_HPP_DEFAULT_DISPATCHER.init(*instance);
 
         if (enableValidationLayers) {

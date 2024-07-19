@@ -3,8 +3,10 @@ cmake_minimum_required(VERSION 3.19)
 
 message(CHECK_START "Downloading Shaderc dependencies")
 
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
+
 execute_process(
-    COMMAND "./utils/git-sync-deps"
+    COMMAND ${Python3_EXECUTABLE} utils/git-sync-deps
     WORKING_DIRECTORY ${shaderc_SOURCE_DIR}
     COMMAND_ECHO STDERR
     COMMAND_ERROR_IS_FATAL ANY

@@ -326,6 +326,9 @@ void run(GLFWwindow* window)
     // Set a list wanted layers
     std::vector<const char*> layers { "VK_LAYER_KHRONOS_validation" };
 
+    // Load the global Vulkan functions
+    VULKAN_HPP_DEFAULT_DISPATCHER.init();
+
     // Create Vulkan instance
     vk::UniqueInstance instance = vk::createInstanceUnique({
         .flags = {},
@@ -336,8 +339,8 @@ void run(GLFWwindow* window)
         .ppEnabledExtensionNames = extensions.data(),
     });
 
-    // Create dynamic loader
-    vk::DispatchLoaderDynamic dldi(*instance, vkGetInstanceProcAddr);
+    // Load the instance-related Vulkan functions
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(*instance);
 
     // Create messenger for debugging
     auto messenger = instance->createDebugUtilsMessengerEXTUnique(
@@ -353,8 +356,7 @@ void run(GLFWwindow* window)
             .pfnUserCallback = debugCallback,
             .pUserData = nullptr,
         },
-        nullptr,
-        dldi);
+        nullptr);
 
     // Create window surface
     const auto createWindowSurface = [&] {
