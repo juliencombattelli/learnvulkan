@@ -244,6 +244,8 @@ private:
 
 int main()
 {
+    spdlog::set_level(spdlog::level::debug);
+
     HelloTriangleApplication app;
 
     try {
