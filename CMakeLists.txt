@@ -27,10 +27,11 @@ find_package(glm CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
-find_package(Vulkan 1.3.264 REQUIRED) # Full dynamic loading using the DispatchLoaderDynamic
 
-message(STATUS "Found vulkan ${Vulkan_VERSION}")
-message(STATUS "Vulkan include directories: ${Vulkan_INCLUDE_DIRS}")
+# 1.3.264 for full dynamic loading using the DispatchLoaderDynamic
+find_package(Vulkan 1.3.264 REQUIRED)
+# Shaderc shared library not available as FindVulkan.cmake component
+find_library(shaderc_shared_LIBRARY NAMES shaderc_shared HINTS $ENV{VULKAN_SDK}/lib REQUIRED)
 
 # Build ImGui
 add_library(imgui
@@ -91,7 +92,7 @@ endif()
 target_link_libraries(vulkan-hpp-test
     PRIVATE
         imgui
-        shaderc
+        ${shaderc_shared_LIBRARY}
         stb
         tinyobjloader
         pch

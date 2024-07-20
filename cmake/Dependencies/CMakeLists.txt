@@ -11,7 +11,7 @@ include_dependencies(
     FetchGLFW.cmake
     FetchGLM.cmake
     FetchImGui.cmake
-    FetchShaderc.cmake
+    # FetchShaderc.cmake
     FetchSpdlog.cmake
     FetchStb.cmake
     FetchTinyObjLoader.cmake
