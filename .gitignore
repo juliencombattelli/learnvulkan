@@ -1,2 +1,4 @@
 /.cache/
 /build/
+/build-gcc/
+/build-clang/
