@@ -25,6 +25,8 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
+include(ForceColoredOutput)
+
 add_subdirectory(cmake/Dependencies)
 
 find_package(glfw 3.4 CONFIG REQUIRED)
