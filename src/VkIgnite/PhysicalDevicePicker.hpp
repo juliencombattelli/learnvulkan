@@ -1,7 +1,7 @@
 #pragma once
 
 #include "spdlog.hpp"
-#include "vulkan.hpp" // IWYU pragma: keep; FIXME don't know why clangd is complaining here
+#include "vulkan.hpp"
 
 struct PhysicalDevicePickResult {
     vk::PhysicalDevice physicalDevice;
