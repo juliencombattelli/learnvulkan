@@ -31,7 +31,7 @@ Install the Microsoft Visual C/C++ Compiler 2022 at least:
 ### Vulkan SDK
 
 Download the Vulkan SDK from LunarG. Replace `${SDK_VERSION}` with `latest` or
-any fixed version greater than `1.3.264`.
+any fixed version greater than `1.3.268`.
 
 #### Linux
 
