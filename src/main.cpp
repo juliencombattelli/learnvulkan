@@ -1,4 +1,5 @@
 #include "VkIgnite/PhysicalDevicePicker.hpp"
+#include "VkIgnite/VkIgnite.hpp"
 
 #include "glfw.hpp"
 
@@ -22,42 +23,6 @@ bool contains(TContainer&& container, TValue&& value, TProjector projector = {})
                std::forward<TValue>(value),
                projector)
         != container.end();
-}
-
-static bool debugCallbackCpp(
-    vk::DebugUtilsMessageSeverityFlagBitsEXT severity,
-    vk::DebugUtilsMessageTypeFlagsEXT /*type*/,
-    const vk::DebugUtilsMessengerCallbackDataEXT& cbData,
-    void* /*userdata*/)
-{
-    using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
-    if /*  */ (severity & eError) {
-        spdlog::error(cbData.pMessage);
-    } else if (severity & eWarning) {
-        spdlog::warn(cbData.pMessage);
-    } else if (severity & eInfo) {
-        spdlog::info(cbData.pMessage);
-    } else if (severity & eVerbose) {
-        spdlog::debug(cbData.pMessage);
-    }
-    return false;
-}
-
-static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT severity,
-    VkDebugUtilsMessageTypeFlagsEXT type,
-    const VkDebugUtilsMessengerCallbackDataEXT* cbData,
-    void* userdata)
-{
-    vk::DebugUtilsMessengerCallbackDataEXT callbackData;
-    callbackData = *cbData;
-    return debugCallbackCpp(
-               static_cast<vk::DebugUtilsMessageSeverityFlagBitsEXT>(severity),
-               static_cast<vk::DebugUtilsMessageTypeFlagBitsEXT>(type),
-               callbackData,
-               userdata)
-        ? VK_TRUE
-        : VK_FALSE;
 }
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE;
@@ -114,77 +79,6 @@ private:
         return extensions;
     }
 
-    [[nodiscard]] static bool areValidationLayersSupported(std::span<const char* const> layers)
-    {
-        auto layerProperties = vk::enumerateInstanceLayerProperties();
-        for (std::string_view layer : layers) {
-            bool layerFound = false;
-            for (vk::LayerProperties properties : layerProperties) {
-                if (layer == properties.layerName) {
-                    layerFound = true;
-                    break;
-                }
-            }
-            if (!layerFound) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    [[nodiscard]] static vk::UniqueInstance createInstanceUnique()
-    {
-        vk::ApplicationInfo appInfo {
-            .pApplicationName = "Hello Triangle",
-            .applicationVersion = VK_MAKE_API_VERSION(0, 1, 0, 0),
-            .pEngineName = "No Engine",
-            .engineVersion = VK_MAKE_API_VERSION(0, 1, 0, 0),
-            .apiVersion = VK_API_VERSION_1_3,
-        };
-
-        auto extensions = getRequiredExtensions();
-
-        vk::InstanceCreateInfo createInfo {
-            .pApplicationInfo = &appInfo,
-            .enabledLayerCount = 0,
-            .ppEnabledLayerNames = nullptr,
-            .enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
-            .ppEnabledExtensionNames = extensions.data(),
-        };
-
-        if (enableValidationLayers) {
-            if (!areValidationLayersSupported(requiredValidationLayers)) {
-                throw std::runtime_error("Validation layers were requested but are not available");
-            }
-            createInfo.enabledLayerCount = static_cast<uint32_t>(requiredValidationLayers.size());
-            createInfo.ppEnabledLayerNames = requiredValidationLayers.data();
-        }
-
-        return vk::createInstanceUnique(createInfo);
-    }
-
-    [[nodiscard]] static vk::UniqueDebugUtilsMessengerEXT createDebugMessengerUnique(
-        vk::Instance& instance)
-    {
-
-        vk::DebugUtilsMessengerCreateInfoEXT createInfo {
-            .messageSeverity =
-                []() {
-                    using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
-                    return eVerbose | eInfo | eWarning | eError;
-                }(),
-            .messageType =
-                []() {
-                    using enum vk::DebugUtilsMessageTypeFlagBitsEXT;
-                    return eGeneral | eValidation | ePerformance;
-                }(),
-            .pfnUserCallback = debugCallback,
-            .pUserData = nullptr,
-        };
-
-        return instance.createDebugUtilsMessengerEXTUnique(createInfo);
-    }
-
     [[nodiscard]] static vk::UniqueSurfaceKHR createSurfaceKHRUnique(
         const vk::Instance& instance,
         GLFWwindow* window)
@@ -202,12 +96,23 @@ private:
     {
         VULKAN_HPP_DEFAULT_DISPATCHER.init();
 
-        instance = createInstanceUnique();
+        instance = vki::makeInstanceUnique(vki::InstanceCreateInfo {
+            .applicationInfo = {
+                .applicationName = "",
+                .applicationVersion = 0,
+                .engineName = "",
+                .engineVersion = 0,
+            },
+            .enabledLayers = {},
+            .enabledExtensions = getRequiredExtensions(),
+            .validationLayerKHROption = vki::Option::Enabled,
+            .debugUtilsMessengerEXTOption = vki::Option::Enabled,
+        });
 
         VULKAN_HPP_DEFAULT_DISPATCHER.init(*instance);
 
         if (enableValidationLayers) {
-            debugMessenger = createDebugMessengerUnique(*instance);
+            debugMessenger = vki::makeDefaultDebugUtilsMessengerEXTUnique(*instance);
         }
 
         surface = createSurfaceKHRUnique(*instance, window);

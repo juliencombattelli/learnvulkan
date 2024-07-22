@@ -73,7 +73,7 @@ target_link_libraries(pch
 )
 
 # Build main application
-add_executable(helloworld src/main.cpp)
+add_executable(helloworld src/main.cpp src/VkIgnite/VkIgnite.cpp)
 if(CMAKE_CXX_COMPILER_ID MATCHES Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
     target_compile_options(helloworld
         PRIVATE
