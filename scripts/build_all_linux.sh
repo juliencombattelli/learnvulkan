@@ -1,10 +1,37 @@
 #!/bin/bash
 
 readonly TIME="/usr/bin/time"
-readonly VULKAN_VERSION="1.3.268.0"
 
 # Vulkan SDKs are assumed to be installed next to the project
-source ../VulkanSDK/$VULKAN_VERSION/setup-env.sh
+readonly VULKAN_SDK_DIR=../VulkanSDK
+readonly VULKAN_PREFERRED_VERSION="1.3.268.0"
+
+echo "################################################################################"
+echo "### Vulkan SDK setup"
+echo "################################################################################"
+echo "Searching for Vulkan SDK in $VULKAN_SDK_DIR"
+if [ -f $VULKAN_SDK_DIR/$VULKAN_PREFERRED_VERSION/setup-env.sh ]; then
+    readonly VULKAN_VERSION=$VULKAN_PREFERRED_VERSION
+else
+    SDK_VERSIONS=$(ls -1 $VULKAN_SDK_DIR | grep -E "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" | sort -rV)
+    for SDK_VERSION in $SDK_VERSIONS; do
+        if [ -f $VULKAN_SDK_DIR/$SDK_VERSION/setup-env.sh ]; then
+            readonly VULKAN_VERSION=$SDK_VERSION
+            break
+        else
+            echo "Skipping unusable SDK version $SDK_VERSION (missing: setup-env.sh)"
+        fi
+    done
+fi
+
+if [ -z $VULKAN_VERSION ]; then
+    echo "No suitable Vulkan SDK found"
+    exit 1
+fi
+
+echo "Using Vulkan SDK $VULKAN_VERSION"
+source $VULKAN_SDK_DIR/$VULKAN_VERSION/setup-env.sh || exit 1
+echo ""
 
 # Compiler object interface
 function compiler_id {
