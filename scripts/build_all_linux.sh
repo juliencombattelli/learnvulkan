@@ -136,9 +136,8 @@ for compiler in "${COMPILERS[@]}"; do
     done
 done
 
-if [ -n "${SOME_BUILD_ERROR}" ]; then
-    echo "At least one of the configuration failed!"
-    echo "Configurations failed:"
+if [ -n "${SOME_CONFIG_ERROR}" ]; then
+    echo "At least one of the configuration failed:"
     for compiler in "${COMPILERS[@]}"; do
         echo "- $(compiler_name $compiler) ($(compiler_config_status $compiler))"
     done
@@ -146,12 +145,12 @@ if [ -n "${SOME_BUILD_ERROR}" ]; then
 fi
 
 if [ -n "${SOME_BUILD_ERROR}" ]; then
-    echo "At least one of the build failed!"
-    echo "Builds failed:"
+    echo "At least one of the build failed:"
     for compiler in "${COMPILERS[@]}"; do
         for build_config in $(compiler_build_configs $compiler); do
-            if [ "$(compiler_config_status $compiler)" != "ok" ]; then
-                echo "- $(compiler_name $compiler) $build_config ($(compiler_build_status $compiler $build_config))"
+            build_result="$(compiler_build_status $compiler $build_config)"
+            if [ "$build_result" != "ok" ]; then
+                echo "- $(compiler_name $compiler) $build_config ($build_result)"
             fi
         done
     done
