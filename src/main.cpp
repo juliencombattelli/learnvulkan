@@ -1,7 +1,7 @@
 #include "VkIgnite/PhysicalDevicePicker.hpp"
 #include "VkIgnite/VkIgnite.hpp"
 
-#include "glfw.hpp"
+#include "VkIgnite/Wsi/Glfw.hpp"
 
 static void glfwErrorCallback(int errorCode, const char* description)
 {
@@ -33,10 +33,6 @@ public:
     static inline constexpr uint32_t height = 600;
     static inline constexpr bool enableValidationLayers = true;
 
-    static inline const std::vector<const char*> requiredValidationLayers {
-        "VK_LAYER_KHRONOS_validation",
-    };
-
     static inline const std::vector<const char*> requiredExtensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
     };
@@ -65,33 +61,6 @@ private:
         glfwSetKeyCallback(window, glfwKeyCallback);
     }
 
-    [[nodiscard]] static std::vector<const char*> getRequiredExtensions()
-    {
-        uint32_t glfwExtensionCount = 0;
-        const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-        std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
-
-        if (enableValidationLayers) {
-            extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-        }
-
-        return extensions;
-    }
-
-    [[nodiscard]] static vk::UniqueSurfaceKHR createSurfaceKHRUnique(
-        const vk::Instance& instance,
-        GLFWwindow* window)
-    {
-        VkSurfaceKHR surface;
-        vk::Result err
-            = static_cast<vk::Result>(glfwCreateWindowSurface(instance, window, nullptr, &surface));
-        if (err != vk::Result::eSuccess) {
-            throw std::runtime_error(vk::to_string(err));
-        }
-        return vk::UniqueSurfaceKHR { surface, instance };
-    }
-
     void initVulkan()
     {
         VULKAN_HPP_DEFAULT_DISPATCHER.init();
@@ -104,7 +73,7 @@ private:
                 .engineVersion = 0,
             },
             .enabledLayers = {},
-            .enabledExtensions = getRequiredExtensions(),
+            .enabledExtensions = vki::wsi::glfw::getRequiredExtensions(),
             .validationLayerKHROption = vki::Option::Enabled,
             .debugUtilsMessengerEXTOption = vki::Option::Enabled,
         });
@@ -115,7 +84,7 @@ private:
             debugMessenger = vki::makeDefaultDebugUtilsMessengerEXTUnique(*instance);
         }
 
-        surface = createSurfaceKHRUnique(*instance, window);
+        surface = vki::wsi::glfw::createSurfaceKHRUnique(*instance, window);
 
         PhysicalDevicePickResult physicalDevicePickResult = PhysicalDevicePicker::pick(
             *instance,
