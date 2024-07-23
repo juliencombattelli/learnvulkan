@@ -15,16 +15,6 @@ static void glfwKeyCallback(GLFWwindow* window, int key, int /*scancode*/, int a
     }
 }
 
-template<typename TContainer, typename TValue, typename TProjector = std::identity>
-bool contains(TContainer&& container, TValue&& value, TProjector projector = {})
-{
-    return std::ranges::find(
-               std::forward<TContainer>(container),
-               std::forward<TValue>(value),
-               projector)
-        != container.end();
-}
-
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE;
 
 class HelloTriangleApplication {
@@ -32,10 +22,6 @@ public:
     static inline constexpr uint32_t width = 800;
     static inline constexpr uint32_t height = 600;
     static inline constexpr bool enableValidationLayers = true;
-
-    static inline const std::vector<const char*> requiredExtensions = {
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-    };
 
     void run()
     {
@@ -56,7 +42,7 @@ private:
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-        window = glfwCreateWindow(width, height, "Vulkan", nullptr, nullptr);
+        window = glfwCreateWindow(width, height, "LearnVulkan", nullptr, nullptr);
 
         glfwSetKeyCallback(window, glfwKeyCallback);
     }
@@ -86,10 +72,12 @@ private:
 
         surface = vki::wsi::glfw::createSurfaceKHRUnique(*instance, window);
 
-        PhysicalDevicePickResult physicalDevicePickResult = PhysicalDevicePicker::pick(
-            *instance,
-            *surface,
-            { { VK_KHR_SWAPCHAIN_EXTENSION_NAME } });
+        std::vector<const std::string_view> requiredDeviceExtensions {
+            VK_KHR_SWAPCHAIN_EXTENSION_NAME
+        };
+
+        PhysicalDevicePickResult physicalDevicePickResult
+            = PhysicalDevicePicker::pick(*instance, *surface, requiredDeviceExtensions);
 
         physicalDevice = physicalDevicePickResult.physicalDevice;
     }
