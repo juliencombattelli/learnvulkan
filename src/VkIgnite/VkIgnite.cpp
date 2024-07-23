@@ -1,5 +1,7 @@
 #include "VkIgnite.hpp"
 
+#include "spdlog.hpp"
+
 static bool debugCallbackCpp(
     vk::DebugUtilsMessageSeverityFlagBitsEXT severity,
     vk::DebugUtilsMessageTypeFlagsEXT /*type*/,
