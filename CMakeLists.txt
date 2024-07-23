@@ -94,12 +94,6 @@ target_link_libraries(helloworld
 
 # Build sample application
 add_executable(vulkan-hpp-test src/vulkan-hpp-test.cpp)
-if(CMAKE_CXX_COMPILER_ID MATCHES Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
-    target_compile_options(vulkan-hpp-test
-        PRIVATE
-            -Wall -Wextra -Wconversion -Wshadow -pedantic
-    )
-endif()
 target_link_libraries(vulkan-hpp-test
     PRIVATE
         imgui
