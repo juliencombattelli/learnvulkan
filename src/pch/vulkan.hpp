@@ -16,9 +16,9 @@
 
 #include <vulkan/vulkan.hpp> // IWYU pragma: export
 
-// Include all others Vulkan headers that might be used transitivelly by
-// vulkan/vulkan.hpp
-// This avoids issues with IWYU
+// Include all others Vulkan headers that might be used transitivelly by vulkan/vulkan.hpp.
+// This avoids "header not used directly" issues with IWYU.
 #include <vulkan/vulkan_enums.hpp> // IWYU pragma: export
 #include <vulkan/vulkan_funcs.hpp> // IWYU pragma: export
+#include <vulkan/vulkan_handles.hpp> // IWYU pragma: export
 #include <vulkan/vulkan_structs.hpp> // IWYU pragma: export
