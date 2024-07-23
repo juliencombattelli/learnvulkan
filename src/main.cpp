@@ -3,6 +3,8 @@
 
 #include "VkIgnite/Wsi/Glfw.hpp"
 
+#include <vector>
+
 static void glfwErrorCallback(int errorCode, const char* description)
 {
     spdlog::error("GLFW error {}: {}", errorCode, description);
@@ -80,6 +82,37 @@ private:
             = PhysicalDevicePicker::pick(*instance, *surface, requiredDeviceExtensions);
 
         physicalDevice = physicalDevicePickResult.physicalDevice;
+
+        spdlog::debug(
+            "graphicsQueueFamilyIndex: {}",
+            physicalDevicePickResult.graphicsQueueFamilyIndex);
+        spdlog::debug(
+            "presentQueueFamilyIndex: {}",
+            physicalDevicePickResult.presentationQueueFamilyIndex);
+
+        // Create a list of queue family indices without duplicates
+        std::vector<uint32_t> familyIndices {
+            physicalDevicePickResult.graphicsQueueFamilyIndex,
+            physicalDevicePickResult.presentationQueueFamilyIndex
+        };
+        vki::sort_unique(familyIndices);
+
+        // Create one queue from each family with the same priority
+        std::vector<vki::QueueCreateInfo> queueCreateInfos;
+        for (auto& queueFamilyIndex : familyIndices) {
+            queueCreateInfos.push_back({
+                .queueFamilyIndex = queueFamilyIndex,
+                .queuePriorities = { 1.f },
+            });
+        }
+
+        // Create a logical device associated to the physical device
+        device = vki::makeDeviceUnique(
+            physicalDevice,
+            {
+                .queueCreateInfos = queueCreateInfos,
+                .enabledExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME },
+            });
     }
 
     void mainLoop()
@@ -104,6 +137,7 @@ private:
     vk::UniqueDebugUtilsMessengerEXT debugMessenger;
     vk::UniqueSurfaceKHR surface;
     vk::PhysicalDevice physicalDevice;
+    vk::UniqueDevice device;
 };
 
 int main()

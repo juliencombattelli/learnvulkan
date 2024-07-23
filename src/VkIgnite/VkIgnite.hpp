@@ -2,6 +2,10 @@
 
 #include "vulkan.hpp"
 
+#include <algorithm>
+#include <string>
+#include <vector>
+
 namespace vki {
 
 // A boolean value to control an option activation like extension or layer
@@ -34,5 +38,29 @@ struct InstanceCreateInfo {
 
 [[nodiscard]] vk::UniqueDebugUtilsMessengerEXT makeDefaultDebugUtilsMessengerEXTUnique(
     vk::Instance instance);
+
+struct QueueCreateInfo {
+    vk::DeviceQueueCreateFlags flags = {};
+    uint32_t queueFamilyIndex = {};
+    std::vector<float> queuePriorities = {};
+};
+
+struct DeviceCreateInfo {
+    vk::DeviceCreateFlags flags = {};
+    std::vector<QueueCreateInfo> queueCreateInfos = {};
+    std::vector<const char*> enabledLayers = {};
+    std::vector<const char*> enabledExtensions = {};
+};
+
+[[nodiscard]] vk::UniqueDevice makeDeviceUnique(
+    vk::PhysicalDevice physicalDevice,
+    DeviceCreateInfo deviceCreateInfo);
+
+template<typename T>
+void sort_unique(std::vector<T>& values)
+{
+    std::sort(values.begin(), values.end());
+    values.erase(std::unique(values.begin(), values.end()), values.end());
+}
 
 } // namespace vki
