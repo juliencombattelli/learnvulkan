@@ -57,9 +57,9 @@ private:
         instance = vki::makeInstanceUnique(vki::InstanceCreateInfo {
             .applicationInfo = {
                 .applicationName = "",
-                .applicationVersion = 0,
+                .applicationVersion = vki::makeVersion(0, 1, 0),
                 .engineName = "",
-                .engineVersion = 0,
+                .engineVersion = vki::makeVersion(0, 1, 0),
             },
             .enabledLayerNames = {},
             .enabledExtensionNames = vki::wsi::glfw::getRequiredExtensions(),

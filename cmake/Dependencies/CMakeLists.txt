@@ -14,5 +14,6 @@ include_dependencies(
     # FetchShaderc.cmake
     FetchSpdlog.cmake
     FetchStb.cmake
+    FetchStrongType.cmake
     FetchTinyObjLoader.cmake
 )

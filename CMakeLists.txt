@@ -33,6 +33,7 @@ find_package(glfw 3.4 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
+find_package(strong_type CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
 
 # 1.3.268 for full dynamic loading using the DispatchLoaderDynamic
@@ -89,6 +90,7 @@ target_link_libraries(helloworld
     PRIVATE
         imgui
         stb
+        strong_type
         tinyobjloader
         pch
 )

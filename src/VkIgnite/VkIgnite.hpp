@@ -1,5 +1,7 @@
 #pragma once
 
+#include "strong_type/strong_type.hpp"
+
 #include "vulkan.hpp"
 
 #include <string>
@@ -7,10 +9,32 @@
 
 namespace vki {
 
-using Version = uint32_t;
+using Version = strong::type<uint32_t, struct VersionTag, strong::default_constructible>;
+using VkApiVersion = strong::type<uint32_t, struct VersionTag>;
 using ExtensionName = const char*;
 using LayerName = const char*;
 using QueueFamilyIndex = uint32_t;
+
+[[nodiscard]] static inline constexpr Version makeVersion(
+    uint32_t major,
+    uint32_t minor,
+    uint32_t patch) noexcept
+{
+    // Reuse the Vulkan version encoding for now, with a variant set to 0 to be
+    // conform with semantic versionning.
+    // The user can still use whatever encoding he wants for application and
+    // engine versions.
+    return Version { VK_MAKE_API_VERSION(0, major, minor, patch) };
+}
+
+[[nodiscard]] static inline constexpr VkApiVersion makeVkApiVersion(
+    uint32_t variant,
+    uint32_t major,
+    uint32_t minor,
+    uint32_t patch) noexcept
+{
+    return VkApiVersion { VK_MAKE_API_VERSION(variant, major, minor, patch) };
+}
 
 // A boolean value to control an option activation like extension or layer
 enum class Option {
@@ -23,7 +47,7 @@ struct ApplicationInfo {
     Version applicationVersion = {};
     std::string engineName = {};
     Version engineVersion = {};
-    Version vkApiVersion = VK_MAKE_API_VERSION(0, 1, 3, 268);
+    VkApiVersion vkApiVersion = makeVkApiVersion(0, 1, 3, 268);
 };
 
 struct InstanceCreateInfo {

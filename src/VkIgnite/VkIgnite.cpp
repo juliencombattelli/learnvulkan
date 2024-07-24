@@ -67,10 +67,10 @@ namespace vki {
 {
     vk::ApplicationInfo appInfo {
         .pApplicationName = instanceCreateInfo.applicationInfo.applicationName.c_str(),
-        .applicationVersion = instanceCreateInfo.applicationInfo.applicationVersion,
+        .applicationVersion = value_of(instanceCreateInfo.applicationInfo.applicationVersion),
         .pEngineName = instanceCreateInfo.applicationInfo.engineName.c_str(),
-        .engineVersion = instanceCreateInfo.applicationInfo.engineVersion,
-        .apiVersion = instanceCreateInfo.applicationInfo.vkApiVersion,
+        .engineVersion = value_of(instanceCreateInfo.applicationInfo.engineVersion),
+        .apiVersion = value_of(instanceCreateInfo.applicationInfo.vkApiVersion),
     };
 
     // Update the debug utils extension requirement according to validation layer requirement
