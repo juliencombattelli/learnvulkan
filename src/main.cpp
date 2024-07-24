@@ -92,7 +92,7 @@ private:
             physicalDevicePickResult.presentationQueueFamilyIndex);
 
         // Create a list of queue family indices without duplicates
-        std::vector<uint32_t> familyIndices {
+        std::vector<vki::QueueFamilyIndex> familyIndices {
             physicalDevicePickResult.graphicsQueueFamilyIndex,
             physicalDevicePickResult.presentationQueueFamilyIndex
         };

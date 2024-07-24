@@ -11,8 +11,8 @@ namespace vki {
 
 struct PhysicalDevicePickResult {
     vk::PhysicalDevice physicalDevice;
-    uint32_t graphicsQueueFamilyIndex;
-    uint32_t presentationQueueFamilyIndex;
+    QueueFamilyIndex graphicsQueueFamilyIndex;
+    QueueFamilyIndex presentationQueueFamilyIndex;
 };
 
 // Pick a Vulkan physical device suitable for graphics rendering. If multiple
@@ -107,11 +107,12 @@ private:
         return extensionsSupported;
     }
 
-    [[nodiscard]] static std::optional<uint32_t> findFirstGraphicsQueueIndex(
+    [[nodiscard]] static std::optional<QueueFamilyIndex> findFirstGraphicsQueueIndex(
         const vk::PhysicalDevice& physicalDevice)
     {
         const std::vector queueFamiliesProperties = physicalDevice.getQueueFamilyProperties();
-        for (uint32_t queueFamilyIndex = 0; queueFamilyIndex < queueFamiliesProperties.size();
+        for (QueueFamilyIndex queueFamilyIndex = 0;
+             queueFamilyIndex < queueFamiliesProperties.size();
              queueFamilyIndex++) {
             const vk::QueueFamilyProperties& queueFamilyProperty
                 = queueFamiliesProperties[queueFamilyIndex];
@@ -123,12 +124,13 @@ private:
         return std::nullopt;
     }
 
-    [[nodiscard]] static std::optional<uint32_t> findFirstPresentationQueueIndex(
+    [[nodiscard]] static std::optional<QueueFamilyIndex> findFirstPresentationQueueIndex(
         const vk::PhysicalDevice& physicalDevice,
         const vk::SurfaceKHR& surface)
     {
         const std::vector queueFamiliesProperties = physicalDevice.getQueueFamilyProperties();
-        for (uint32_t queueFamilyIndex = 0; queueFamilyIndex < queueFamiliesProperties.size();
+        for (QueueFamilyIndex queueFamilyIndex = 0;
+             queueFamilyIndex < queueFamiliesProperties.size();
              queueFamilyIndex++) {
             if (physicalDevice.getSurfaceSupportKHR(queueFamilyIndex, surface)) {
                 return queueFamilyIndex;
@@ -150,9 +152,10 @@ private:
         bool requiredExtensionsAvailable
             = areRequiredDeviceExtensionsAvailable(physicalDevice, requiredDeviceExtensions);
 
-        std::optional<uint32_t> graphicsQueueIndex = findFirstGraphicsQueueIndex(physicalDevice);
+        std::optional<QueueFamilyIndex> graphicsQueueIndex
+            = findFirstGraphicsQueueIndex(physicalDevice);
 
-        std::optional<uint32_t> presentationQueueIndex
+        std::optional<QueueFamilyIndex> presentationQueueIndex
             = findFirstPresentationQueueIndex(physicalDevice, surface);
 
         bool isCompatible = requiredExtensionsAvailable && graphicsQueueIndex.has_value()

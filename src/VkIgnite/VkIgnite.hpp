@@ -9,6 +9,7 @@ namespace vki {
 
 using ExtensionName = const char*;
 using LayerName = const char*;
+using QueueFamilyIndex = uint32_t;
 
 // A boolean value to control an option activation like extension or layer
 enum class Option {
@@ -43,7 +44,7 @@ struct InstanceCreateInfo {
 
 struct QueueCreateInfo {
     vk::DeviceQueueCreateFlags flags = {};
-    uint32_t queueFamilyIndex = {};
+    QueueFamilyIndex queueFamilyIndex = {};
     std::vector<float> queuePriorities = {};
 };
 
