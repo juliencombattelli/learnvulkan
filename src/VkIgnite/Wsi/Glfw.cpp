@@ -2,12 +2,12 @@
 
 namespace vki::wsi::glfw {
 
-[[nodiscard]] std::vector<const char*> getRequiredExtensions()
+[[nodiscard]] std::vector<ExtensionName> getRequiredExtensions()
 {
     uint32_t glfwExtensionCount = 0;
-    const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+    ExtensionName* glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
-    std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+    std::vector<ExtensionName> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
     return extensions;
 }
