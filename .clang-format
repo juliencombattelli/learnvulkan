@@ -1,4 +1,4 @@
-# This clang-format configuration is compatible with clang-format 13
+# This clang-format configuration is compatible with clang-format 13 to 18
 BasedOnStyle: WebKit
 Language: Cpp
 Standard: c++20
