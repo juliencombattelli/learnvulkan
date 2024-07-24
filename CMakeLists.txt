@@ -56,13 +56,13 @@ target_link_libraries(imgui
 
 # Build precompiled headers
 add_library(pch INTERFACE)
-target_include_directories(pch INTERFACE src/pch)
+target_include_directories(pch INTERFACE src/Pch)
 target_precompile_headers(pch
     INTERFACE
-        src/pch/glfw.hpp
-        src/pch/glm.hpp
-        src/pch/spdlog.hpp
-        src/pch/vulkan.hpp
+        src/Pch/glfw.hpp
+        src/Pch/glm.hpp
+        src/Pch/spdlog.hpp
+        src/Pch/vulkan.hpp
 )
 target_link_libraries(pch
     INTERFACE
