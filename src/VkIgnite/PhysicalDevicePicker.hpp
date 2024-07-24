@@ -11,6 +11,21 @@ struct PhysicalDevicePickResult {
     uint32_t presentationQueueFamilyIndex;
 };
 
+// Pick a Vulkan physical device suitable for graphics rendering. If multiple
+// devices are suitable, the preferred one is selected.
+//
+// Current suitability checks:
+// - all required device extensions are available
+// - the device provides a graphics queue
+// - the device provides a presentation queue
+//
+// Device properties preference:
+// - type: discrete > integrated > virtual > cpu > other
+//
+// TODO provide an environment variable to force the selection for the rare case
+// when two or more GPUs with the same type is found (eg. two discrete graphics
+// cards), or more generally for when the selection algorithm fails to select
+// the more appropriate device.
 class PhysicalDevicePicker {
 public:
     [[nodiscard]] static PhysicalDevicePickResult pick(
