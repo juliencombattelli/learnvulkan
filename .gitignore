@@ -1,4 +1,4 @@
-/.cache/
-/build/
-/build-gcc/
-/build-clang/
+/.cache
+/build
+/build-gcc
+/build-clang
