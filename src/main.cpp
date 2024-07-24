@@ -1,7 +1,8 @@
 #include "VkIgnite/PhysicalDevicePicker.hpp"
 #include "VkIgnite/VkIgnite.hpp"
-
 #include "VkIgnite/Wsi/Glfw.hpp"
+
+#include "Stdx/Algorithm.hpp"
 
 #include <vector>
 
@@ -95,7 +96,7 @@ private:
             physicalDevicePickResult.graphicsQueueFamilyIndex,
             physicalDevicePickResult.presentationQueueFamilyIndex
         };
-        vki::sort_unique(familyIndices);
+        stdx::ranges::sort_unique(familyIndices);
 
         // Create one queue from each family with the same priority
         std::vector<vki::QueueCreateInfo> queueCreateInfos;

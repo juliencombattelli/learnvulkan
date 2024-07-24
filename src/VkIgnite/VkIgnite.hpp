@@ -56,11 +56,4 @@ struct DeviceCreateInfo {
     vk::PhysicalDevice physicalDevice,
     DeviceCreateInfo deviceCreateInfo);
 
-template<typename T>
-void sort_unique(std::vector<T>& values)
-{
-    std::sort(values.begin(), values.end());
-    values.erase(std::unique(values.begin(), values.end()), values.end());
-}
-
 } // namespace vki

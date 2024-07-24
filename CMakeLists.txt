@@ -78,6 +78,7 @@ add_executable(helloworld
     src/VkIgnite/VkIgnite.cpp
     src/VkIgnite/Wsi/Glfw.cpp
 )
+target_include_directories(helloworld PRIVATE src)
 if(CMAKE_CXX_COMPILER_ID MATCHES Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
     target_compile_options(helloworld
         PRIVATE

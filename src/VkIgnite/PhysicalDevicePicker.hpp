@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Stdx/Algorithm.hpp"
+
 #include "spdlog.hpp"
 #include "vulkan.hpp"
 
@@ -73,7 +75,7 @@ private:
         const std::vector availableExtensions = physicalDevice.enumerateDeviceExtensionProperties();
         bool extensionsSupported = true;
         for (std::string_view requiredExtension : requiredDeviceExtensions) {
-            if (!contains(
+            if (!stdx::ranges::contains(
                     availableExtensions,
                     requiredExtension,
                     [](const vk::ExtensionProperties& extprop) -> std::string_view {
@@ -154,18 +156,5 @@ private:
             .graphicsQueueFamilyIndex = *graphicsQueueIndex,
             .presentationQueueFamilyIndex = *presentationQueueIndex,
         };
-    }
-
-    template<typename TContainer, typename TValue, typename TProjector = std::identity>
-    [[nodiscard]] static bool contains(
-        TContainer&& container,
-        TValue&& value,
-        TProjector projector = {})
-    {
-        return std::ranges::find(
-                   std::forward<TContainer>(container),
-                   std::forward<TValue>(value),
-                   projector)
-            != container.end();
     }
 };
