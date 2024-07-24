@@ -2,11 +2,13 @@
 
 #include "vulkan.hpp"
 
-#include <algorithm>
 #include <string>
 #include <vector>
 
 namespace vki {
+
+using ExtensionName = const char*;
+using LayerName = const char*;
 
 // A boolean value to control an option activation like extension or layer
 enum class Option {
@@ -25,9 +27,9 @@ struct ApplicationInfo {
 struct InstanceCreateInfo {
     ApplicationInfo applicationInfo = {};
     // List of layers to enable
-    std::vector<const char*> enabledLayers = {};
+    std::vector<LayerName> enabledLayerNames = {};
     // List of extensions to enable
-    std::vector<const char*> enabledExtensions = {};
+    std::vector<ExtensionName> enabledExtensionNames = {};
     // Whether to enable the validation layer from Khronos
     Option validationLayerKHROption = Option::Disabled;
     // Whether to enable the debug utils extension
@@ -48,8 +50,8 @@ struct QueueCreateInfo {
 struct DeviceCreateInfo {
     vk::DeviceCreateFlags flags = {};
     std::vector<QueueCreateInfo> queueCreateInfos = {};
-    std::vector<const char*> enabledLayers = {};
-    std::vector<const char*> enabledExtensions = {};
+    std::vector<LayerName> enabledLayerNames = {};
+    std::vector<ExtensionName> enabledExtensionNames = {};
 };
 
 [[nodiscard]] vk::UniqueDevice makeDeviceUnique(

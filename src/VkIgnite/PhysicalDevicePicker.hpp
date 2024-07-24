@@ -2,8 +2,12 @@
 
 #include "Stdx/Algorithm.hpp"
 
+#include "VkIgnite.hpp"
+
 #include "spdlog.hpp"
 #include "vulkan.hpp"
+
+namespace vki {
 
 struct PhysicalDevicePickResult {
     vk::PhysicalDevice physicalDevice;
@@ -31,7 +35,7 @@ public:
     [[nodiscard]] static PhysicalDevicePickResult pick(
         const vk::Instance& instance,
         const vk::SurfaceKHR& surface,
-        std::span<const std::string_view> requiredDeviceExtensions)
+        std::span<vki::ExtensionName> requiredDeviceExtensions)
     {
         std::vector<PhysicalDevicePickResult> compatiblePhysicalDevices;
 
@@ -85,7 +89,7 @@ private:
 
     [[nodiscard]] static bool areRequiredDeviceExtensionsAvailable(
         const vk::PhysicalDevice& physicalDevice,
-        std::span<const std::string_view> requiredDeviceExtensions)
+        std::span<vki::ExtensionName> requiredDeviceExtensions)
     {
         const std::vector availableExtensions = physicalDevice.enumerateDeviceExtensionProperties();
         bool extensionsSupported = true;
@@ -137,7 +141,7 @@ private:
     [[nodiscard]] static std::optional<PhysicalDevicePickResult> isPhysicalDeviceCompatible(
         const vk::PhysicalDevice& physicalDevice,
         const vk::SurfaceKHR& surface,
-        std::span<const std::string_view> requiredDeviceExtensions)
+        std::span<vki::ExtensionName> requiredDeviceExtensions)
     {
         std::string_view deviceName = physicalDevice.getProperties().deviceName;
 
@@ -168,3 +172,5 @@ private:
         };
     }
 };
+
+} // namespace vki

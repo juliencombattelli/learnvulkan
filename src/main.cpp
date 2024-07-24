@@ -61,8 +61,8 @@ private:
                 .engineName = "",
                 .engineVersion = 0,
             },
-            .enabledLayers = {},
-            .enabledExtensions = vki::wsi::glfw::getRequiredExtensions(),
+            .enabledLayerNames = {},
+            .enabledExtensionNames = vki::wsi::glfw::getRequiredExtensions(),
             .validationLayerKHROption = vki::Option::Enabled,
             .debugUtilsMessengerEXTOption = vki::Option::Enabled,
         });
@@ -75,12 +75,12 @@ private:
 
         surface = vki::wsi::glfw::createSurfaceKHRUnique(*instance, window);
 
-        std::vector<const std::string_view> requiredDeviceExtensions {
+        std::vector<vki::ExtensionName> requiredDeviceExtensions {
             VK_KHR_SWAPCHAIN_EXTENSION_NAME
         };
 
-        PhysicalDevicePickResult physicalDevicePickResult
-            = PhysicalDevicePicker::pick(*instance, *surface, requiredDeviceExtensions);
+        vki::PhysicalDevicePickResult physicalDevicePickResult
+            = vki::PhysicalDevicePicker::pick(*instance, *surface, requiredDeviceExtensions);
 
         physicalDevice = physicalDevicePickResult.physicalDevice;
 
@@ -112,7 +112,7 @@ private:
             physicalDevice,
             {
                 .queueCreateInfos = queueCreateInfos,
-                .enabledExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME },
+                .enabledExtensionNames = { VK_KHR_SWAPCHAIN_EXTENSION_NAME },
             });
 
         // Get the queue handles from the device

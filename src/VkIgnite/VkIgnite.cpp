@@ -86,7 +86,7 @@ namespace vki {
 
     // Add the debug utils extension to the list if needed
     if (instanceCreateInfo.debugUtilsMessengerEXTOption == Option::Enabled) {
-        instanceCreateInfo.enabledExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+        instanceCreateInfo.enabledExtensionNames.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     }
 
     // Ensure the validation layer is present if required
@@ -97,18 +97,17 @@ namespace vki {
 
     // Add the validation layer to the list if needed
     if (instanceCreateInfo.validationLayerKHROption == Option::Enabled) {
-        instanceCreateInfo.enabledLayers.push_back("VK_LAYER_KHRONOS_validation");
+        instanceCreateInfo.enabledLayerNames.push_back("VK_LAYER_KHRONOS_validation");
     }
 
-    vk::InstanceCreateInfo createInfo {
+    return vk::createInstanceUnique({
         .pApplicationInfo = &appInfo,
-        .enabledLayerCount = static_cast<uint32_t>(instanceCreateInfo.enabledLayers.size()),
-        .ppEnabledLayerNames = instanceCreateInfo.enabledLayers.data(),
-        .enabledExtensionCount = static_cast<uint32_t>(instanceCreateInfo.enabledExtensions.size()),
-        .ppEnabledExtensionNames = instanceCreateInfo.enabledExtensions.data(),
-    };
-
-    return vk::createInstanceUnique(createInfo);
+        .enabledLayerCount = static_cast<uint32_t>(instanceCreateInfo.enabledLayerNames.size()),
+        .ppEnabledLayerNames = instanceCreateInfo.enabledLayerNames.data(),
+        .enabledExtensionCount
+        = static_cast<uint32_t>(instanceCreateInfo.enabledExtensionNames.size()),
+        .ppEnabledExtensionNames = instanceCreateInfo.enabledExtensionNames.data(),
+    });
 }
 
 [[nodiscard]] vk::UniqueDebugUtilsMessengerEXT makeDefaultDebugUtilsMessengerEXTUnique(
@@ -152,10 +151,11 @@ namespace vki {
         .flags = deviceCreateInfo.flags,
         .queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size()),
         .pQueueCreateInfos = queueCreateInfos.data(),
-        .enabledLayerCount = static_cast<uint32_t>(deviceCreateInfo.enabledLayers.size()),
-        .ppEnabledLayerNames = deviceCreateInfo.enabledLayers.data(),
-        .enabledExtensionCount = static_cast<uint32_t>(deviceCreateInfo.enabledExtensions.size()),
-        .ppEnabledExtensionNames = deviceCreateInfo.enabledExtensions.data(),
+        .enabledLayerCount = static_cast<uint32_t>(deviceCreateInfo.enabledLayerNames.size()),
+        .ppEnabledLayerNames = deviceCreateInfo.enabledLayerNames.data(),
+        .enabledExtensionCount
+        = static_cast<uint32_t>(deviceCreateInfo.enabledExtensionNames.size()),
+        .ppEnabledExtensionNames = deviceCreateInfo.enabledExtensionNames.data(),
     });
 }
 
