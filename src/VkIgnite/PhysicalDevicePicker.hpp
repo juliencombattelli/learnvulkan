@@ -136,15 +136,10 @@ private:
         std::optional<uint32_t> presentationQueueIndex
             = findFirstPresentationQueueIndex(physicalDevice, surface);
 
-        std::initializer_list<bool> checks {
-            requiredExtensionsAvailable,
-            graphicsQueueIndex.has_value(),
-            presentationQueueIndex.has_value(),
-        };
+        bool isCompatible = requiredExtensionsAvailable && graphicsQueueIndex.has_value()
+            && presentationQueueIndex.has_value();
 
-        static constexpr auto fails = [](auto test) { return !test; };
-
-        if (std::ranges::any_of(checks, fails)) {
+        if (!isCompatible) {
             spdlog::warn("Physical device {} is not compatible", deviceName);
             return std::nullopt;
         }
