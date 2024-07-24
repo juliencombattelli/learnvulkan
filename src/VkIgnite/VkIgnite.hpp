@@ -7,6 +7,7 @@
 
 namespace vki {
 
+using Version = uint32_t;
 using ExtensionName = const char*;
 using LayerName = const char*;
 using QueueFamilyIndex = uint32_t;
@@ -19,10 +20,10 @@ enum class Option {
 
 struct ApplicationInfo {
     std::string applicationName = {};
-    uint32_t applicationVersion = {};
+    Version applicationVersion = {};
     std::string engineName = {};
-    uint32_t engineVersion = {};
-    uint32_t vkApiVersion = VK_MAKE_API_VERSION(0, 1, 3, 268);
+    Version engineVersion = {};
+    Version vkApiVersion = VK_MAKE_API_VERSION(0, 1, 3, 268);
 };
 
 struct InstanceCreateInfo {
