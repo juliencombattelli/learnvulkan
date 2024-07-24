@@ -114,6 +114,11 @@ private:
                 .queueCreateInfos = queueCreateInfos,
                 .enabledExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME },
             });
+
+        // Get the queue handles from the device
+        graphicsQueue = device->getQueue(physicalDevicePickResult.graphicsQueueFamilyIndex, 0);
+        presentationQueue
+            = device->getQueue(physicalDevicePickResult.presentationQueueFamilyIndex, 0);
     }
 
     void mainLoop()
@@ -139,6 +144,8 @@ private:
     vk::UniqueSurfaceKHR surface;
     vk::PhysicalDevice physicalDevice;
     vk::UniqueDevice device;
+    vk::Queue graphicsQueue;
+    vk::Queue presentationQueue;
 };
 
 int main()
