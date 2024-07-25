@@ -10,17 +10,8 @@
 namespace vki {
 
 using Version = strong::type<uint32_t, struct VersionTag, strong::default_constructible>;
-using VkApiVersion = strong::type<uint32_t, struct VersionTag>;
-using ExtensionName = const char*;
-using LayerName = const char*;
 
-using QueueFamilyIndex = strong::type<
-    uint32_t,
-    struct QueueFamilyIndexTag,
-    strong::equality,
-    strong::ordered,
-    strong::bicrementable>;
-
+// TODO move to defaults
 [[nodiscard]] static inline constexpr Version makeVersion(
     uint32_t major,
     uint32_t minor,
@@ -30,17 +21,57 @@ using QueueFamilyIndex = strong::type<
     // conform with semantic versionning.
     // The user can still use whatever encoding he wants for application and
     // engine versions.
-    return Version { VK_MAKE_API_VERSION(0, major, minor, patch) };
+    return Version { vk::makeApiVersion(0u, major, minor, patch) };
 }
 
-[[nodiscard]] static inline constexpr VkApiVersion makeVkApiVersion(
-    uint32_t variant,
-    uint32_t major,
-    uint32_t minor,
-    uint32_t patch) noexcept
-{
-    return VkApiVersion { VK_MAKE_API_VERSION(variant, major, minor, patch) };
-}
+class ApiVersion {
+public:
+    [[nodiscard]] constexpr ApiVersion(
+        uint32_t variant,
+        uint32_t major,
+        uint32_t minor,
+        uint32_t patch)
+        : value_ { vk::makeApiVersion(variant, major, minor, patch) } {};
+
+    [[nodiscard]] constexpr uint32_t variant() const
+    {
+        return vk::apiVersionVariant(value_);
+    }
+
+    [[nodiscard]] constexpr uint32_t major() const
+    {
+        return vk::apiVersionMajor(value_);
+    }
+
+    [[nodiscard]] constexpr uint32_t minor() const
+    {
+        return vk::apiVersionMinor(value_);
+    }
+
+    [[nodiscard]] constexpr uint32_t patch() const
+    {
+        return vk::apiVersionPatch(value_);
+    }
+
+    [[nodiscard]] constexpr uint32_t value() const
+    {
+        return value_;
+    }
+
+private:
+    uint32_t value_;
+};
+
+// Cannot use strong::type for those as they are given to Vulkan through arrays
+using ExtensionName = const char*;
+using LayerName = const char*;
+
+using QueueFamilyIndex = strong::type<
+    uint32_t,
+    struct QueueFamilyIndexTag,
+    strong::equality,
+    strong::ordered,
+    strong::bicrementable>;
 
 // A boolean value to control an option activation like extension or layer
 enum class Option {
@@ -53,7 +84,7 @@ struct ApplicationInfo {
     Version applicationVersion = {};
     std::string engineName = {};
     Version engineVersion = {};
-    VkApiVersion vkApiVersion = makeVkApiVersion(0, 1, 3, 268);
+    ApiVersion vkApiVersion { 0, 1, 3, 268 };
 };
 
 struct InstanceCreateInfo {
