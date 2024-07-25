@@ -1,6 +1,6 @@
 #pragma once
 
-#include "strong_type/strong_type.hpp"
+#include <strong_type/strong_type.hpp>
 
 #include "vulkan.hpp"
 
@@ -13,7 +13,13 @@ using Version = strong::type<uint32_t, struct VersionTag, strong::default_constr
 using VkApiVersion = strong::type<uint32_t, struct VersionTag>;
 using ExtensionName = const char*;
 using LayerName = const char*;
-using QueueFamilyIndex = uint32_t;
+
+using QueueFamilyIndex = strong::type<
+    uint32_t,
+    struct QueueFamilyIndexTag,
+    strong::equality,
+    strong::ordered,
+    strong::bicrementable>;
 
 [[nodiscard]] static inline constexpr Version makeVersion(
     uint32_t major,
@@ -69,7 +75,7 @@ struct InstanceCreateInfo {
 
 struct QueueCreateInfo {
     vk::DeviceQueueCreateFlags flags = {};
-    QueueFamilyIndex queueFamilyIndex = {};
+    QueueFamilyIndex queueFamilyIndex { strong::uninitialized };
     std::vector<float> queuePriorities = {};
 };
 

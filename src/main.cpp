@@ -86,10 +86,10 @@ private:
 
         spdlog::debug(
             "graphicsQueueFamilyIndex: {}",
-            physicalDevicePickResult.graphicsQueueFamilyIndex);
+            value_of(physicalDevicePickResult.graphicsQueueFamilyIndex));
         spdlog::debug(
             "presentQueueFamilyIndex: {}",
-            physicalDevicePickResult.presentationQueueFamilyIndex);
+            value_of(physicalDevicePickResult.presentationQueueFamilyIndex));
 
         // Create a list of queue family indices without duplicates
         std::vector<vki::QueueFamilyIndex> familyIndices {
@@ -116,9 +116,10 @@ private:
             });
 
         // Get the queue handles from the device
-        graphicsQueue = device->getQueue(physicalDevicePickResult.graphicsQueueFamilyIndex, 0);
+        graphicsQueue
+            = device->getQueue(value_of(physicalDevicePickResult.graphicsQueueFamilyIndex), 0);
         presentationQueue
-            = device->getQueue(physicalDevicePickResult.presentationQueueFamilyIndex, 0);
+            = device->getQueue(value_of(physicalDevicePickResult.presentationQueueFamilyIndex), 0);
     }
 
     void mainLoop()

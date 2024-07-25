@@ -111,11 +111,12 @@ private:
         const vk::PhysicalDevice& physicalDevice)
     {
         const std::vector queueFamiliesProperties = physicalDevice.getQueueFamilyProperties();
-        for (QueueFamilyIndex queueFamilyIndex = 0;
-             queueFamilyIndex < queueFamiliesProperties.size();
+        const QueueFamilyIndex queueFamiliesCount { static_cast<uint32_t>(
+            queueFamiliesProperties.size()) };
+        for (QueueFamilyIndex queueFamilyIndex { 0u }; queueFamilyIndex < queueFamiliesCount;
              queueFamilyIndex++) {
             const vk::QueueFamilyProperties& queueFamilyProperty
-                = queueFamiliesProperties[queueFamilyIndex];
+                = queueFamiliesProperties[value_of(queueFamilyIndex)];
             if (queueFamilyProperty.queueFlags & vk::QueueFlagBits::eGraphics) {
                 return queueFamilyIndex;
             }
@@ -129,10 +130,11 @@ private:
         const vk::SurfaceKHR& surface)
     {
         const std::vector queueFamiliesProperties = physicalDevice.getQueueFamilyProperties();
-        for (QueueFamilyIndex queueFamilyIndex = 0;
-             queueFamilyIndex < queueFamiliesProperties.size();
+        const QueueFamilyIndex queueFamiliesCount { static_cast<uint32_t>(
+            queueFamiliesProperties.size()) };
+        for (QueueFamilyIndex queueFamilyIndex { 0u }; queueFamilyIndex < queueFamiliesCount;
              queueFamilyIndex++) {
-            if (physicalDevice.getSurfaceSupportKHR(queueFamilyIndex, surface)) {
+            if (physicalDevice.getSurfaceSupportKHR(value_of(queueFamilyIndex), surface)) {
                 return queueFamilyIndex;
             }
         }

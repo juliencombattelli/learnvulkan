@@ -140,7 +140,7 @@ namespace vki {
     for (QueueCreateInfo& queueCreateInfo : deviceCreateInfo.queueCreateInfos) {
         queueCreateInfos.push_back({
             .flags = queueCreateInfo.flags,
-            .queueFamilyIndex = queueCreateInfo.queueFamilyIndex,
+            .queueFamilyIndex = value_of(queueCreateInfo.queueFamilyIndex),
             .queueCount = static_cast<uint32_t>(queueCreateInfo.queuePriorities.size()),
             .pQueuePriorities = queueCreateInfo.queuePriorities.data(),
         });
