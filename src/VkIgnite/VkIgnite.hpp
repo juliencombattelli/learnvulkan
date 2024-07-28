@@ -65,13 +65,7 @@ private:
 // Cannot use strong::type for those as they are given to Vulkan through arrays
 using ExtensionName = const char*;
 using LayerName = const char*;
-
-using QueueFamilyIndex = strong::type<
-    uint32_t,
-    struct QueueFamilyIndexTag,
-    strong::equality,
-    strong::ordered,
-    strong::bicrementable>;
+using QueueFamilyIndex = uint32_t;
 
 // A boolean value to control an option activation like extension or layer
 enum class Option {
@@ -106,7 +100,7 @@ struct InstanceCreateInfo {
 
 struct QueueCreateInfo {
     vk::DeviceQueueCreateFlags flags = {};
-    QueueFamilyIndex queueFamilyIndex { strong::uninitialized };
+    QueueFamilyIndex queueFamilyIndex = {};
     std::vector<float> queuePriorities = {};
 };
 

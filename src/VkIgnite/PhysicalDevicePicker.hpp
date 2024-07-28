@@ -9,10 +9,17 @@
 
 namespace vki {
 
+struct SwapchainSupportDetails {
+    vk::SurfaceCapabilitiesKHR capabilities;
+    std::vector<vk::SurfaceFormatKHR> formats;
+    std::vector<vk::PresentModeKHR> presentModes;
+};
+
 struct PhysicalDevicePickResult {
     vk::PhysicalDevice physicalDevice;
     QueueFamilyIndex graphicsQueueFamilyIndex;
     QueueFamilyIndex presentationQueueFamilyIndex;
+    SwapchainSupportDetails swapchainSupportDetails;
 };
 
 // Pick a Vulkan physical device suitable for graphics rendering. If multiple
@@ -22,6 +29,8 @@ struct PhysicalDevicePickResult {
 // - all required device extensions are available
 // - the device provides a graphics queue
 // - the device provides a presentation queue
+// - the surface provides at least one surface format
+// - the surface provides at least one presentation mode
 //
 // Device properties preference:
 // - type: discrete > integrated > virtual > cpu > other
@@ -113,10 +122,10 @@ private:
         const std::vector queueFamiliesProperties = physicalDevice.getQueueFamilyProperties();
         const QueueFamilyIndex queueFamiliesCount { static_cast<uint32_t>(
             queueFamiliesProperties.size()) };
-        for (QueueFamilyIndex queueFamilyIndex { 0u }; queueFamilyIndex < queueFamiliesCount;
+        for (QueueFamilyIndex queueFamilyIndex = 0; queueFamilyIndex < queueFamiliesCount;
              queueFamilyIndex++) {
             const vk::QueueFamilyProperties& queueFamilyProperty
-                = queueFamiliesProperties[value_of(queueFamilyIndex)];
+                = queueFamiliesProperties[queueFamilyIndex];
             if (queueFamilyProperty.queueFlags & vk::QueueFlagBits::eGraphics) {
                 return queueFamilyIndex;
             }
@@ -132,14 +141,25 @@ private:
         const std::vector queueFamiliesProperties = physicalDevice.getQueueFamilyProperties();
         const QueueFamilyIndex queueFamiliesCount { static_cast<uint32_t>(
             queueFamiliesProperties.size()) };
-        for (QueueFamilyIndex queueFamilyIndex { 0u }; queueFamilyIndex < queueFamiliesCount;
+        for (QueueFamilyIndex queueFamilyIndex = 0; queueFamilyIndex < queueFamiliesCount;
              queueFamilyIndex++) {
-            if (physicalDevice.getSurfaceSupportKHR(value_of(queueFamilyIndex), surface)) {
+            if (physicalDevice.getSurfaceSupportKHR(queueFamilyIndex, surface)) {
                 return queueFamilyIndex;
             }
         }
         spdlog::debug("Incompatible physical device: no presentation queue");
         return std::nullopt;
+    }
+
+    [[nodiscard]] static SwapchainSupportDetails querySwapchainSupport(
+        const vk::PhysicalDevice& physicalDevice,
+        const vk::SurfaceKHR& surface)
+    {
+        return {
+            .capabilities = physicalDevice.getSurfaceCapabilitiesKHR(surface),
+            .formats = physicalDevice.getSurfaceFormatsKHR(surface),
+            .presentModes = physicalDevice.getSurfacePresentModesKHR(surface),
+        };
     }
 
     [[nodiscard]] static std::optional<PhysicalDevicePickResult> isPhysicalDeviceCompatible(
@@ -160,8 +180,12 @@ private:
         std::optional<QueueFamilyIndex> presentationQueueIndex
             = findFirstPresentationQueueIndex(physicalDevice, surface);
 
+        SwapchainSupportDetails swapchainSupport = querySwapchainSupport(physicalDevice, surface);
+        bool swapchainAdequate
+            = !swapchainSupport.formats.empty() && !swapchainSupport.presentModes.empty();
+
         bool isCompatible = requiredExtensionsAvailable && graphicsQueueIndex.has_value()
-            && presentationQueueIndex.has_value();
+            && presentationQueueIndex.has_value() && swapchainAdequate;
 
         if (!isCompatible) {
             spdlog::warn("Physical device {} is not compatible", deviceName);
@@ -174,6 +198,7 @@ private:
             .physicalDevice = physicalDevice,
             .graphicsQueueFamilyIndex = *graphicsQueueIndex,
             .presentationQueueFamilyIndex = *presentationQueueIndex,
+            .swapchainSupportDetails = swapchainSupport,
         };
     }
 };
