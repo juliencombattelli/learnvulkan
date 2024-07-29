@@ -174,13 +174,41 @@ private:
 
     [[nodiscard]] static uint32_t chooseImageCount(const vk::SurfaceCapabilitiesKHR& capabilities)
     {
-        // Allocate one more image than the strict minimum the driver requires to work properly
+        // Allocate one more image than the strict minimum the driver requires to work properly to
+        // avoid waiting on the driver
         uint32_t imageCount = capabilities.minImageCount + 1;
         // Ensure the maximum number of image supported by the driver is not exceeded
         if (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount) {
             imageCount = capabilities.maxImageCount;
         }
+        spdlog::debug("Minimal image count: {}", imageCount);
         return imageCount;
+    }
+
+    void createImageViews()
+    {
+        swapchainImageViews.resize(swapchainImages.size());
+        for (size_t i = 0; i < swapchainImages.size(); i++) {
+            vk::ImageViewCreateInfo imageViewCreateInfo {
+                .image = swapchainImages[i],
+                .viewType = vk::ImageViewType::e2D,
+                .format = swapchainImageFormat,
+                .components= {
+                    .r = vk::ComponentSwizzle::eIdentity,
+                    .g = vk::ComponentSwizzle::eIdentity,
+                    .b = vk::ComponentSwizzle::eIdentity,
+                    .a = vk::ComponentSwizzle::eIdentity,
+                },
+                .subresourceRange = {
+                    .aspectMask = vk::ImageAspectFlagBits::eColor,
+                    .baseMipLevel = 0,
+                    .levelCount = 1,
+                    .baseArrayLayer = 0,
+                    .layerCount = 1,
+                },
+            };
+            swapchainImageViews[i] = device->createImageViewUnique(imageViewCreateInfo);
+        }
     }
 
     void createSwapchain(const vki::SwapchainSupportDetails& swapchainSupportDetails)
@@ -221,6 +249,8 @@ private:
         swapchainImages = device->getSwapchainImagesKHR(*swapchain);
         swapchainImageFormat = surfaceFormat.format;
         swapchainExtent = extent;
+
+        createImageViews();
     }
 
     void mainLoop()
@@ -259,6 +289,7 @@ private:
     std::vector<vk::Image> swapchainImages;
     vk::Format swapchainImageFormat;
     vk::Extent2D swapchainExtent;
+    std::vector<vk::UniqueImageView> swapchainImageViews;
 };
 
 int main()
