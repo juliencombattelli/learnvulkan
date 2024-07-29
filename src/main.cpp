@@ -2,6 +2,8 @@
 #include "VkIgnite/VkIgnite.hpp"
 #include "VkIgnite/Wsi/Glfw.hpp"
 
+#include "spdlog/spdlog.h"
+
 #include "Stdx/Algorithm.hpp"
 
 #include <vector>
