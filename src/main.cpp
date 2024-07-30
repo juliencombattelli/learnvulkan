@@ -1,4 +1,5 @@
 #include "VkIgnite/PhysicalDevicePicker.hpp"
+#include "VkIgnite/Shader.hpp"
 #include "VkIgnite/VkIgnite.hpp"
 #include "VkIgnite/Wsi/Glfw.hpp"
 
@@ -19,6 +20,26 @@ static void glfwKeyCallback(GLFWwindow* window, int key, int /*scancode*/, int a
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
 }
+
+constexpr const char kVertexShaderSource[] = R"vertexshader(
+#version 450
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec3 color;
+layout(location = 0) out vec3 fragColor;
+void main() {
+    gl_Position = vec4(position, 1.0);
+    fragColor = color;
+}
+)vertexshader";
+
+constexpr const char kFragmentShaderSource[] = R"fragmentShader(
+#version 450
+layout(location = 0) in vec3 fragColor;
+layout(location = 0) out vec4 outColor;
+void main() {
+    outColor = vec4(fragColor, 1.0);
+}
+)fragmentShader";
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE;
 
@@ -122,6 +143,8 @@ private:
             = device->getQueue(physicalDevicePickResult.presentationQueueFamilyIndex, 0);
 
         createSwapchain(physicalDevicePickResult.swapchainSupportDetails);
+
+        compileShaders();
     }
 
     [[nodiscard]] static vk::SurfaceFormatKHR chooseSurfaceFormat(
@@ -255,6 +278,32 @@ private:
         createImageViews();
     }
 
+    void compileShaders()
+    {
+        shaderc::CompileOptions options;
+        options.SetOptimizationLevel(shaderc_optimization_level_performance);
+
+        vertexShader = vki::Shader::compileGlslToSpv(
+            *device,
+            kVertexShaderSource,
+            vki::ShaderCompileInfo {
+                .shaderKind = shaderc_vertex_shader,
+                .inputIdentifier = "vertex shader",
+                .entryPointName = "main",
+                .option = options,
+            });
+
+        fragmentShader = vki::Shader::compileGlslToSpv(
+            *device,
+            kFragmentShaderSource,
+            vki::ShaderCompileInfo {
+                .shaderKind = shaderc_fragment_shader,
+                .inputIdentifier = "fragment shader",
+                .entryPointName = "main",
+                .option = options,
+            });
+    }
+
     void mainLoop()
     {
         while (!glfwWindowShouldClose(window)) {
@@ -292,6 +341,8 @@ private:
     vk::Format swapchainImageFormat;
     vk::Extent2D swapchainExtent;
     std::vector<vk::UniqueImageView> swapchainImageViews;
+    vk::UniqueShaderModule vertexShader;
+    vk::UniqueShaderModule fragmentShader;
 };
 
 int main()

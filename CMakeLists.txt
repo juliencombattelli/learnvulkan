@@ -89,6 +89,7 @@ endif()
 target_link_libraries(helloworld
     PRIVATE
         imgui
+        ${shaderc_shared_LIBRARY}
         stb
         strong_type
         tinyobjloader
