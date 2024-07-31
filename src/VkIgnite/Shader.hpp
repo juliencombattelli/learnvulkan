@@ -11,8 +11,8 @@ namespace vki {
 struct ShaderCompileInfo {
     shaderc_shader_kind shaderKind;
     std::string_view inputIdentifier;
-    std::string_view entryPointName;
-    const shaderc::CompileOptions& option;
+    std::string_view entryPointName = "main";
+    const shaderc::CompileOptions& option = {};
 };
 
 class Shader {

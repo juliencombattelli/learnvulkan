@@ -289,7 +289,6 @@ private:
             vki::ShaderCompileInfo {
                 .shaderKind = shaderc_vertex_shader,
                 .inputIdentifier = "vertex shader",
-                .entryPointName = "main",
                 .option = options,
             });
 
@@ -299,7 +298,6 @@ private:
             vki::ShaderCompileInfo {
                 .shaderKind = shaderc_fragment_shader,
                 .inputIdentifier = "fragment shader",
-                .entryPointName = "main",
                 .option = options,
             });
     }
