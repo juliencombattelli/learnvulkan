@@ -160,9 +160,8 @@ private:
 
         createSwapchain(physicalDevicePickResult.swapchainSupportDetails);
 
-        createRenderPass();
         createGraphicsPipeline();
-        createFramebuffers();
+
         createCommandPool();
         createCommandBuffer();
         createSyncObjects();
@@ -257,12 +256,12 @@ private:
         }
     }
 
-    void createSwapchain(const vki::SwapchainSupportDetails& swapchainSupportDetails)
+    void createSwapchain(const vki::SwapchainSupportDetails& swapchainSupport)
     {
-        vk::SurfaceFormatKHR surfaceFormat = chooseSurfaceFormat(swapchainSupportDetails.formats);
-        vk::PresentModeKHR presentMode = choosePresentMode(swapchainSupportDetails.presentModes);
-        vk::Extent2D extent = chooseExtent(window, swapchainSupportDetails.capabilities);
-        uint32_t imageCount = chooseImageCount(swapchainSupportDetails.capabilities);
+        vk::SurfaceFormatKHR surfaceFormat = chooseSurfaceFormat(swapchainSupport.formats);
+        vk::PresentModeKHR presentMode = choosePresentMode(swapchainSupport.presentModes);
+        vk::Extent2D extent = chooseExtent(window, swapchainSupport.capabilities);
+        uint32_t imageCount = chooseImageCount(swapchainSupport.capabilities);
 
         vk::SwapchainCreateInfoKHR swapchainCreateInfo {
             .flags = {},
@@ -276,7 +275,7 @@ private:
             .imageSharingMode = vk::SharingMode::eExclusive,
             .queueFamilyIndexCount = 0,
             .pQueueFamilyIndices = nullptr,
-            .preTransform = swapchainSupportDetails.capabilities.currentTransform,
+            .preTransform = swapchainSupport.capabilities.currentTransform,
             .compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque,
             .presentMode = presentMode,
             .clipped = vk::True,
@@ -297,6 +296,8 @@ private:
         swapchainExtent = extent;
 
         createImageViews();
+        createRenderPass();
+        createFramebuffers();
     }
 
     void createRenderPass()
@@ -525,6 +526,12 @@ private:
         inFlightFence = device->createFenceUnique(fenceCreateInfo);
     }
 
+    void recreateSwapchain()
+    {
+        device->waitIdle();
+        createSwapchain(swapchainSupportDetails);
+    }
+
     void recordCommandBuffer(vk::CommandBuffer cmdBuffer, uint32_t imageIndex)
     {
         vk::CommandBufferBeginInfo commandBufferBeginInfo {};
@@ -587,11 +594,16 @@ private:
             std::numeric_limits<uint64_t>::max(),
             imageAvailableSemaphore.get(),
             {});
-        if (imageIndex.result != vk::Result::eSuccess) {
+        if (imageIndex.result == vk::Result::eErrorOutOfDateKHR) {
             spdlog::warn(
-                "acquireNextImageKHR returned {}, skipping frame",
+                "acquireNextImageKHR returned {}, recreating swapchain",
                 to_string(imageIndex.result));
+            recreateSwapchain();
             return;
+        } else if (
+            imageIndex.result != vk::Result::eSuccess
+            && imageIndex.result != vk::Result::eSuboptimalKHR) {
+            throw std::runtime_error("Failed to acquire swapchain image!");
         }
 
         commandBuffer->reset();
@@ -623,8 +635,14 @@ private:
             .pImageIndices = &imageIndex.value,
         };
         vk::Result presentationResult = presentationQueue.presentKHR(presentInfo);
-        if (presentationResult != vk::Result::eSuccess) {
-            spdlog::warn("presentKHR returned ", to_string(presentationResult));
+        if (presentationResult == vk::Result::eErrorOutOfDateKHR
+            || presentationResult == vk::Result::eSuboptimalKHR) {
+            spdlog::warn(
+                "acquireNextImageKHR returned {}, recreating swapchain",
+                to_string(presentationResult));
+            recreateSwapchain();
+        } else if (presentationResult != vk::Result::eSuccess) {
+            throw std::runtime_error("Failed to present swapchain image!");
         }
     }
 
@@ -660,6 +678,7 @@ private:
 
     vk::UniqueSurfaceKHR surface;
     vk::PhysicalDevice physicalDevice;
+    vki::SwapchainSupportDetails swapchainSupportDetails;
     vk::UniqueDevice device;
 
     QueueFamiliesInfo queueFamiliesInfo;
