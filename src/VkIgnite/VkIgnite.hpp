@@ -115,4 +115,14 @@ struct DeviceCreateInfo {
     vk::PhysicalDevice physicalDevice,
     DeviceCreateInfo deviceCreateInfo);
 
+struct SwapchainSupportDetails {
+    vk::SurfaceCapabilitiesKHR capabilities;
+    std::vector<vk::SurfaceFormatKHR> formats;
+    std::vector<vk::PresentModeKHR> presentModes;
+};
+
+[[nodiscard]] SwapchainSupportDetails querySwapchainSupport(
+    const vk::PhysicalDevice& physicalDevice,
+    const vk::SurfaceKHR& surface);
+
 } // namespace vki

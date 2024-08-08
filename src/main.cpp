@@ -83,11 +83,19 @@ private:
         glfwInit();
 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
         window = glfwCreateWindow(Width, Height, "LearnVulkan", nullptr, nullptr);
 
+        glfwSetWindowUserPointer(window, this);
+        glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
         glfwSetKeyCallback(window, glfwKeyCallback);
+    }
+
+    static void framebufferResizeCallback(GLFWwindow* window, int /*width*/, int /*height*/)
+    {
+        HelloTriangleApplication* app
+            = reinterpret_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
+        app->framebufferResized = true;
     }
 
     void initVulkan()
@@ -532,7 +540,19 @@ private:
 
     void recreateSwapchain()
     {
+        framebufferResized = false;
+
+        int width = 0, height = 0;
+        glfwGetFramebufferSize(window, &width, &height);
+        while (width == 0 || height == 0) {
+            glfwGetFramebufferSize(window, &width, &height);
+            glfwWaitEvents();
+        }
+
         device->waitIdle();
+
+        vki::SwapchainSupportDetails swapchainSupportDetails
+            = vki::querySwapchainSupport(physicalDevice, *surface);
         createSwapchain(swapchainSupportDetails);
     }
 
@@ -641,9 +661,9 @@ private:
         };
         vk::Result presentationResult = presentationQueue.presentKHR(presentInfo);
         if (presentationResult == vk::Result::eErrorOutOfDateKHR
-            || presentationResult == vk::Result::eSuboptimalKHR) {
+            || presentationResult == vk::Result::eSuboptimalKHR || framebufferResized) {
             spdlog::warn(
-                "acquireNextImageKHR returned {}, recreating swapchain",
+                "presentKHR returned {}, recreating swapchain",
                 to_string(presentationResult));
             recreateSwapchain();
         } else if (presentationResult != vk::Result::eSuccess) {
@@ -685,7 +705,6 @@ private:
 
     vk::UniqueSurfaceKHR surface;
     vk::PhysicalDevice physicalDevice;
-    vki::SwapchainSupportDetails swapchainSupportDetails;
     vk::UniqueDevice device;
 
     QueueFamiliesInfo queueFamiliesInfo;
@@ -710,6 +729,8 @@ private:
     std::vector<vk::UniqueSemaphore> renderFinishedSemaphores;
     std::vector<vk::UniqueFence> inFlightFences;
     uint32_t currentFrame = 0;
+
+    bool framebufferResized = false;
 };
 
 int main()

@@ -9,12 +9,6 @@
 
 namespace vki {
 
-struct SwapchainSupportDetails {
-    vk::SurfaceCapabilitiesKHR capabilities;
-    std::vector<vk::SurfaceFormatKHR> formats;
-    std::vector<vk::PresentModeKHR> presentModes;
-};
-
 struct PhysicalDevicePickResult {
     vk::PhysicalDevice physicalDevice;
     QueueFamilyIndex graphicsQueueFamilyIndex;
@@ -149,17 +143,6 @@ private:
         }
         spdlog::debug("Incompatible physical device: no presentation queue");
         return std::nullopt;
-    }
-
-    [[nodiscard]] static SwapchainSupportDetails querySwapchainSupport(
-        const vk::PhysicalDevice& physicalDevice,
-        const vk::SurfaceKHR& surface)
-    {
-        return {
-            .capabilities = physicalDevice.getSurfaceCapabilitiesKHR(surface),
-            .formats = physicalDevice.getSurfaceFormatsKHR(surface),
-            .presentModes = physicalDevice.getSurfacePresentModesKHR(surface),
-        };
     }
 
     [[nodiscard]] static std::optional<PhysicalDevicePickResult> isPhysicalDeviceCompatible(

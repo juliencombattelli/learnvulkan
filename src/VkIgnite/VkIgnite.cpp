@@ -159,4 +159,15 @@ namespace vki {
     });
 }
 
+[[nodiscard]] SwapchainSupportDetails querySwapchainSupport(
+    const vk::PhysicalDevice& physicalDevice,
+    const vk::SurfaceKHR& surface)
+{
+    return {
+        .capabilities = physicalDevice.getSurfaceCapabilitiesKHR(surface),
+        .formats = physicalDevice.getSurfaceFormatsKHR(surface),
+        .presentModes = physicalDevice.getSurfacePresentModesKHR(surface),
+    };
+}
+
 } // namespace vki
