@@ -4,8 +4,8 @@ Based on https://vulkan-tutorial.com
 
 ## Supported platforms
 
-- Linux (GCC and Clang): tested on Ubuntu 22.04 and 24.04
-- Windows (MSVC): tested on Windows 10 and 11
+- Linux (GCC, Clang): tested on Ubuntu 22.04 and 24.04
+- Windows (MSVC, MinGW): tested on Windows 10 and 11
 
 ## Requirements
 
@@ -16,9 +16,10 @@ Based on https://vulkan-tutorial.com
 Install the tools required to build the project:
 
 ```shell
-sudo apt install cmake pkg-config ninja-build build-essential
+sudo apt install cmake pkg-config ninja-build build-essential mingw-w64
 ```
 
+To cross-compile to Windows using Mingw
 #### Windows
 
 Install the Microsoft Visual C/C++ Compiler 2022 at least:
