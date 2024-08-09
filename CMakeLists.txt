@@ -2,10 +2,11 @@ cmake_minimum_required(VERSION 3.20)
 project(LearnVulkan VERSION 1.0.0)
 
 # Use RelWithDebInfo as default build configuration
-# For Ninja Multi-Config generator
-set(CMAKE_DEFAULT_BUILD_TYPE RelWithDebInfo CACHE STRING "" FORCE)
-# For single-config generators
-if(NOT CMAKE_BUILD_TYPE)
+if(CMAKE_GENERATOR MATCHES "Ninja Multi-Config")
+    # For Ninja Multi-Config generator
+    set(CMAKE_DEFAULT_BUILD_TYPE RelWithDebInfo CACHE STRING "" FORCE)
+elseif(NOT CMAKE_BUILD_TYPE)
+    # For single-config generators
     set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "" FORCE)
 endif()
 
