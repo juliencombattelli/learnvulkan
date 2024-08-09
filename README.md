@@ -7,35 +7,28 @@ Based on https://vulkan-tutorial.com
 - Linux (GCC, Clang): tested on Ubuntu 22.04 and 24.04
 - Windows (MSVC, MinGW): tested on Windows 10 and 11
 
-## Requirements
+## Building
 
-### Build tools
+### Ubuntu (native)
 
-#### Ubuntu
+<details>
+<summary>Steps</summary>
 
-Install the tools required to build the project:
+#### Common requirements
 
+- Install the tools required to build the project:
 ```shell
-sudo apt install cmake pkg-config ninja-build build-essential mingw-w64
+sudo apt install cmake pkg-config ninja-build build-essential
 ```
 
-To cross-compile to Windows using Mingw
-#### Windows
+- To build GLFW from source on Linux, a few extra packages must be installed as
+explained in [GLFW documentation](https://www.glfw.org/docs/3.4/compile.html):
+```shell
+sudo apt install libwayland-dev libxkbcommon-dev xorg-dev
+```
 
-Install the Microsoft Visual C/C++ Compiler 2022 at least:
-
-- if you want the full-fledged Visual Studio IDE, install
-  [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
-- if you prefer just the command line tools, install the
-  [Build Tools for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
-
-### Vulkan SDK
-
-Download the Vulkan SDK from LunarG. Replace `${SDK_VERSION}` with `latest` or
-any fixed version greater than `1.3.268`.
-
-#### Linux
-
+- Download the Vulkan SDK from LunarG. Replace `${SDK_VERSION}` with `latest` or
+any fixed version greater than `1.3.268.0`:
 ```shell
 mkdir VulkanSDK
 cd VulkanSDK
@@ -43,36 +36,9 @@ wget https://sdk.lunarg.com/sdk/download/${SDK_VERSION}/linux/vulkan_sdk.tar.xz
 tar -xvf vulkan_sdk.tar.xz
 ```
 
-#### Windows (from Powershell)
+#### GCC
 
-```shell
-Invoke-WebRequest https://sdk.lunarg.com/sdk/download/${SDK_VERSION}/windows/vulkan_sdk.exe
-.\vulkan_sdk.exe
-# In the UI select the desired install location and optional components
-```
-
-### GLFW dependencies
-
-#### Ubuntu
-
-To build GLFW on Linux, a few extra packages must be installed as explained in
-[GLFW documentation](https://www.glfw.org/docs/3.4/compile.html):
-
-```shell
-sudo apt install libwayland-dev libxkbcommon-dev xorg-dev
-```
-
-#### Window
-
-The Visual Studio environment come with all necessary tools to build GLFW, so
-nothing specific to do.
-
-## Building
-
-### Ubuntu
-
-In a terminal open at the project root directory, run the following commands:
-
+- In a terminal open at the project root directory, run the following commands:
 ```shell
 # Use the desired Vulkan SDK
 source path/to/VulkanSDK/${SDK_VERSION}/setup-env.sh
@@ -84,11 +50,57 @@ cmake -S . -B build -G "Ninja Multi-Config"
 cmake --build build --config release
 ```
 
-### Windows
+#### Clang
 
-Open a Powershell terminal with x64 build tools available, go at the project
+TODO
+
+</details>
+
+### Ubuntu (cross-compilation to Windows using MinGW)
+
+<details>
+<summary>Steps</summary>
+
+- To cross-compile from Ubuntu to Windows using MinGW, install the following
+packages:
+```shell
+sudo apt install cmake pkg-config ninja-build mingw-w64 7zip
+```
+
+- Then, install the Vulkan SDK for Windows:
+```shell
+mkdir VulkanSDK-Windows
+cd VulkanSDK-Windows
+wget https://sdk.lunarg.com/sdk/download/${SDK_VERSION}/windows/vulkan_sdk.exe
+7z x vulkan_sdk.exe -o${SDK_VERSION}
+```
+
+</details>
+
+### Window
+
+<details>
+<summary>Steps</summary>
+
+#### Common requirements
+
+- Install the Vulkan SDK for Windows:
+```shell
+Invoke-WebRequest https://sdk.lunarg.com/sdk/download/${SDK_VERSION}/windows/vulkan_sdk.exe
+.\vulkan_sdk.exe
+# In the UI select the desired install location and optional components
+```
+
+#### MSVC
+
+- Install the Microsoft Visual C/C++ Compiler 2022 at least:
+  * if you want the full-fledged Visual Studio IDE, install
+    [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
+  * if you prefer just the command line tools, install the
+    [Build Tools for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
+
+- Open a Powershell terminal with x64 build tools available, go at the project
 root location and run the following commands:
-
 ```shell
 # Ensure the VULKAN_SDK environment variable is setup properly
 echo $Env:VULKAN_SDK
@@ -99,3 +111,9 @@ cmake -S . -B build -G "Ninja Multi-Config"
 # Build the project
 cmake --build build --config release
 ```
+
+#### MinGW
+
+TODO
+
+</details>
