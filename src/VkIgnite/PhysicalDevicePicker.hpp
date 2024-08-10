@@ -7,6 +7,10 @@
 #include "spdlog.hpp"
 #include "vulkan.hpp"
 
+#include <charconv>
+#include <cstdlib>
+#include <system_error>
+
 namespace vki {
 
 struct PhysicalDevicePickResult {
@@ -18,6 +22,10 @@ struct PhysicalDevicePickResult {
 
 // Pick a Vulkan physical device suitable for graphics rendering. If multiple
 // devices are suitable, the preferred one is selected.
+// If the DEVICE_ID environment variable is defined, the device having the
+// corresponding ID is selected. If it is not found, the program terminates. To
+// get the list of device IDs, run the program once without the environment
+// variable and check the debug logs
 //
 // Current suitability checks:
 // - all required device extensions are available
@@ -28,11 +36,6 @@ struct PhysicalDevicePickResult {
 //
 // Device properties preference:
 // - type: discrete > integrated > virtual > cpu > other
-//
-// TODO provide an environment variable to force the selection for the rare case
-// when two or more GPUs with the same type is found (eg. two discrete graphics
-// cards), or more generally for when the selection algorithm fails to select
-// the more appropriate device.
 class PhysicalDevicePicker {
 public:
     [[nodiscard]] static PhysicalDevicePickResult pick(
@@ -42,8 +45,14 @@ public:
     {
         std::vector<PhysicalDevicePickResult> compatiblePhysicalDevices;
 
+        spdlog::debug("Enumerating devices...");
         const std::vector physicalDevices = instance.enumeratePhysicalDevices();
         for (const vk::PhysicalDevice& physicalDevice : physicalDevices) {
+            auto deviceProperties = physicalDevice.getProperties();
+            spdlog::debug(
+                "Device: ID={}, name=\"{}\"",
+                deviceProperties.deviceID,
+                std::string_view(deviceProperties.deviceName));
             std::optional<PhysicalDevicePickResult> physicalDevicePickResult
                 = isPhysicalDeviceCompatible(physicalDevice, surface, requiredDeviceExtensions);
             if (physicalDevicePickResult.has_value()) {
@@ -55,13 +64,53 @@ public:
             std::runtime_error("No compatible physical device found");
         }
 
-        std::ranges::sort(compatiblePhysicalDevices, compareDevicesByPreference);
-        PhysicalDevicePickResult& preferedPhysicalDevices = compatiblePhysicalDevices.front();
+        char* userSelectedDeviceId = std::getenv("DEVICE_ID");
+        if (userSelectedDeviceId != nullptr) {
+            spdlog::debug("DEVICE_ID provided: {}", userSelectedDeviceId);
+            return pickFromEnv(userSelectedDeviceId, compatiblePhysicalDevices);
+        }
 
-        return preferedPhysicalDevices;
+        std::ranges::sort(compatiblePhysicalDevices, compareDevicesByPreference);
+        PhysicalDevicePickResult& preferedPhysicalDevice = compatiblePhysicalDevices.front();
+        return preferedPhysicalDevice;
     }
 
 private:
+    [[nodiscard]] static PhysicalDevicePickResult pickFromEnv(
+        std::string_view userSelectedDeviceId,
+        const std::vector<PhysicalDevicePickResult>& compatiblePhysicalDevices)
+    {
+
+        uint32_t deviceId = 0;
+        auto [ptr, ec] = std::from_chars(
+            userSelectedDeviceId.data(),
+            userSelectedDeviceId.data() + userSelectedDeviceId.size(),
+            deviceId);
+        if (ec != std::errc()) {
+            switch (ec) {
+            case std::errc::invalid_argument:
+                spdlog::error("DEVICE_ID must be a valid uint32_t.");
+                break;
+            case std::errc::result_out_of_range:
+                spdlog::error("DEVICE_ID is larger than an uint32_t.");
+                break;
+            default:
+                spdlog::error("Unespected error while parsing DEVICE_ID.");
+            }
+            exit(EXIT_FAILURE);
+        }
+        auto selectedDeviceIt = std::ranges::find_if(
+            compatiblePhysicalDevices,
+            [deviceId](const PhysicalDevicePickResult& compatibleDevice) -> bool {
+                return compatibleDevice.physicalDevice.getProperties().deviceID == deviceId;
+            });
+        if (selectedDeviceIt == compatiblePhysicalDevices.end()) {
+            spdlog::error("Selected device ID {} not found.", deviceId);
+            exit(EXIT_FAILURE);
+        }
+        return *selectedDeviceIt;
+    }
+
     [[nodiscard]] static bool compareDevicesByPreference(
         const PhysicalDevicePickResult& device1,
         const PhysicalDevicePickResult& device2)
