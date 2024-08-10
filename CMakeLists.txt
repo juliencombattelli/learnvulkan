@@ -38,9 +38,17 @@ find_package(strong_type CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
 
 # 1.3.268 for full dynamic loading using the DispatchLoaderDynamic
+set(CMAKE_FIND_DEBUG_MODE FALSE)
 find_package(Vulkan 1.3.268 REQUIRED)
+set(CMAKE_FIND_DEBUG_MODE FALSE)
 # Shaderc shared library not available as FindVulkan.cmake component
-find_library(shaderc_shared_LIBRARY NAMES shaderc_shared HINTS $ENV{VULKAN_SDK}/lib REQUIRED)
+find_library(shaderc_shared_LIBRARY
+    NAMES shaderc_shared
+    HINTS
+        $ENV{VULKAN_SDK}/lib
+        $ENV{VULKAN_SDK}/Lib
+    REQUIRED
+)
 
 # Build ImGui
 add_library(imgui
