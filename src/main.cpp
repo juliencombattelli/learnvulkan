@@ -288,7 +288,7 @@ private:
             .compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque,
             .presentMode = presentMode,
             .clipped = vk::True,
-            .oldSwapchain = nullptr,
+            .oldSwapchain = *swapchain_,
         };
 
         if (queueFamiliesInfo_.graphicsQueueFamilyIndex
@@ -614,20 +614,22 @@ private:
             return;
         }
 
-        vk::ResultValue<uint32_t> imageIndex = device_->acquireNextImageKHR(
+        uint32_t imageIndex;
+        vk::Result acquireNextImageResult = device_->acquireNextImageKHR(
             *swapchain_,
             std::numeric_limits<uint64_t>::max(),
             imageAvailableSemaphores_[currentFrame_].get(),
-            {});
-        if (imageIndex.result == vk::Result::eErrorOutOfDateKHR) {
+            {},
+            &imageIndex);
+        if (acquireNextImageResult == vk::Result::eErrorOutOfDateKHR) {
             spdlog::warn(
                 "acquireNextImageKHR returned {}, recreating swapchain",
-                to_string(imageIndex.result));
+                to_string(acquireNextImageResult));
             recreateSwapchain();
             return;
         } else if (
-            imageIndex.result != vk::Result::eSuccess
-            && imageIndex.result != vk::Result::eSuboptimalKHR) {
+            acquireNextImageResult != vk::Result::eSuccess
+            && acquireNextImageResult != vk::Result::eSuboptimalKHR) {
             throw std::runtime_error("Failed to acquire swapchain image!");
         }
 
@@ -635,7 +637,7 @@ private:
 
         commandBuffers_[currentFrame_]->reset();
 
-        recordCommandBuffer(*commandBuffers_[currentFrame_], imageIndex.value);
+        recordCommandBuffer(*commandBuffers_[currentFrame_], imageIndex);
 
         vk::Semaphore waitSemaphores[] = { *imageAvailableSemaphores_[currentFrame_] };
         vk::Semaphore signalSemaphores[] = { *renderFinishedSemaphores_[currentFrame_] };
@@ -659,9 +661,9 @@ private:
             .pWaitSemaphores = signalSemaphores,
             .swapchainCount = 1,
             .pSwapchains = swapchains,
-            .pImageIndices = &imageIndex.value,
+            .pImageIndices = &imageIndex,
         };
-        vk::Result presentationResult = presentationQueue_.presentKHR(presentInfo);
+        vk::Result presentationResult = presentationQueue_.presentKHR(&presentInfo);
         if (presentationResult == vk::Result::eErrorOutOfDateKHR
             || presentationResult == vk::Result::eSuboptimalKHR || framebufferResized_) {
             spdlog::warn(
@@ -744,6 +746,7 @@ int main()
     try {
         app.run();
     } catch (const std::exception& e) {
+        spdlog::error("Caught unhandled exception!");
         spdlog::error(e.what());
         return EXIT_FAILURE;
     }
