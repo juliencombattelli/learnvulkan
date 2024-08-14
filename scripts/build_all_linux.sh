@@ -134,7 +134,7 @@ function print_build_footer {
 
 for compiler in "${COMPILERS[@]}"; do
     print_configuration_header $compiler
-    if ! CC=$(compiler_c $compiler) CXX=$(compiler_cxx $compiler) $TIME cmake -S . -B build-$(compiler_id $compiler) -G "Ninja Multi-Config"; then
+    if ! CC=$(compiler_c $compiler) CXX=$(compiler_cxx $compiler) $TIME cmake -S . -B build/$(compiler_id $compiler) -G "Ninja Multi-Config"; then
         compiler_set_config_status $compiler failed
         SOME_CONFIG_ERROR=1
     else
@@ -153,7 +153,7 @@ for compiler in "${COMPILERS[@]}"; do
     fi
     for build_config in $(compiler_build_configs $compiler); do
         print_build_header $compiler $build_config
-        if ! $TIME cmake --build "build-$(compiler_id $compiler)" --config "$build_config"; then
+        if ! $TIME cmake --build "build/$(compiler_id $compiler)" --config "$build_config"; then
             compiler_set_build_status $compiler $build_config failed
             SOME_BUILD_ERROR=1
         else
