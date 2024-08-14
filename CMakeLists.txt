@@ -32,15 +32,13 @@ add_subdirectory(cmake/Dependencies)
 
 find_package(glfw 3.4 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
+find_package(glslang CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(strong_type CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
 
-# 1.3.268 for full dynamic loading using the DispatchLoaderDynamic
-find_package(Vulkan 1.3.268 REQUIRED)
-# Shaderc shared library not available as FindVulkan.cmake component
-find_library(shaderc_shared_LIBRARY NAMES shaderc_shared HINTS $ENV{VULKAN_SDK}/lib REQUIRED)
+include(Vulkan)
 
 # Build ImGui
 add_library(imgui
@@ -71,14 +69,16 @@ target_link_libraries(pch
         glfw
         glm::glm
         spdlog::spdlog
-        Vulkan::Headers # Currently vulkan is loaded dynamically by the application
+        # Currently vulkan is loaded dynamically by the application, so only headers are needed
+        Vulkan::Headers
 )
 
 # Build main application
 add_executable(helloworld
     src/main.cpp
-    src/VkIgnite/VkIgnite.cpp
     src/VkIgnite/Wsi/Glfw.cpp
+    src/VkIgnite/VkIgnite.cpp
+    src/VkIgnite/Shader.cpp
 )
 target_include_directories(helloworld PRIVATE src)
 if(CMAKE_CXX_COMPILER_ID MATCHES Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
@@ -90,7 +90,9 @@ endif()
 target_link_libraries(helloworld
     PRIVATE
         imgui
-        ${shaderc_shared_LIBRARY}
+        glslang
+        glslang-default-resource-limits
+        SPIRV
         stb
         strong_type
         tinyobjloader
@@ -98,12 +100,12 @@ target_link_libraries(helloworld
 )
 
 # Build sample application
-add_executable(vulkan-hpp-test src/vulkan-hpp-test.cpp)
-target_link_libraries(vulkan-hpp-test
-    PRIVATE
-        imgui
-        ${shaderc_shared_LIBRARY}
-        stb
-        tinyobjloader
-        pch
-)
+# add_executable(vulkan-hpp-test src/vulkan-hpp-test.cpp)
+# target_link_libraries(vulkan-hpp-test
+#     PRIVATE
+#         imgui
+#         ${shaderc_shared_LIBRARY}
+#         stb
+#         tinyobjloader
+#         pch
+# )

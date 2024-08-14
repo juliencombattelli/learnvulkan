@@ -10,6 +10,7 @@ endfunction()
 include_dependencies(
     FetchGLFW.cmake
     FetchGLM.cmake
+    FetchGlslang.cmake
     FetchImGui.cmake
     # FetchShaderc.cmake
     FetchSpdlog.cmake

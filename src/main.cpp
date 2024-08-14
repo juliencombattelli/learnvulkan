@@ -356,16 +356,12 @@ private:
 
     void createGraphicsPipeline()
     {
-        shaderc::CompileOptions options;
-        options.SetOptimizationLevel(shaderc_optimization_level_performance);
-
         vk::UniqueShaderModule vertexShader = vki::Shader::compileGlslToSpv(
             *device_,
             kVertexShaderSource,
             vki::ShaderCompileInfo {
-                .shaderKind = shaderc_vertex_shader,
+                .shaderStage = GLSLANG_STAGE_VERTEX,
                 .inputIdentifier = "vertex shader",
-                .option = options,
             });
 
         vk::PipelineShaderStageCreateInfo vertexShaderStageCreateInfo {
@@ -378,9 +374,8 @@ private:
             *device_,
             kFragmentShaderSource,
             vki::ShaderCompileInfo {
-                .shaderKind = shaderc_fragment_shader,
+                .shaderStage = GLSLANG_STAGE_FRAGMENT,
                 .inputIdentifier = "fragment shader",
-                .option = options,
             });
 
         vk::PipelineShaderStageCreateInfo fragmentShaderStageCreateInfo {
