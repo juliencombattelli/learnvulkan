@@ -24,13 +24,11 @@ add_subdirectory(cmake/Dependencies)
 
 find_package(glfw 3.4 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
-find_package(glslang CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(strong_type CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
-
-include(Vulkan)
+find_package(Vulkan 1.3.268.0 MODULE REQUIRED COMPONENTS glslang)
 
 # Build ImGui
 add_library(imgui
@@ -81,16 +79,16 @@ if(CMAKE_CXX_COMPILER_ID MATCHES Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
 endif()
 target_link_libraries(helloworld
     PRIVATE
+        pch
         imgui
-        glslang
-        glslang-default-resource-limits
-        SPIRV
         stb
         strong_type
         tinyobjloader
-        pch
+        Vulkan::glslang
+        Vulkan::glslang-default-resource-limits
 )
 
+# Not buildable due to Shaderc dependency
 # Build sample application
 # add_executable(vulkan-hpp-test src/vulkan-hpp-test.cpp)
 # target_link_libraries(vulkan-hpp-test
