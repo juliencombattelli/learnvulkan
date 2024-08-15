@@ -117,3 +117,23 @@ cmake --build build --config release
 TODO
 
 </details>
+
+## To do
+
+### High priority
+
+- [-] Stop using FindVulkan as it is always outdated and use CMake config files from SDK
+- [-] Use Vulkan 1.3.275.0 as min version to get proper CMake support from SDK
+      => CMake config files from SDK are currently broken...
+      => Will stay on 1.3.268.0
+
+- [x] Define a custom minimal FindVulkan based on CMake's one
+      => Not really minimal, but functionnal
+- [ ] Define the Vulkan min version once in CMake and propagate it anywhere needed
+- [ ] For native builds, require the SDK to be installed
+- [ ] For cross compile builds, requires SDK for target system to be installed
+
+### Low priority
+
+- [ ] For cross compile builds, if host tools are required (glslc) build them from sources if not already installed
+- [ ] (?) Add support for a VULKAN_SDK_HOST env var for systems having host and target SDK
