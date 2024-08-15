@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.24)
 
 include(FetchContent)
 
+# TODO detect if VULKAN_SDK is installed and choose the associated glslang tag
 message(CHECK_START "Fetching and configuring glslang vulkan-sdk-${VULKAN_MIN_VERSION}")
 FetchContent_Declare(
     glslang
