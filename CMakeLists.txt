@@ -16,6 +16,11 @@ set(CMAKE_C_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
+set(VULKAN_MIN_VERSION_MAJOR 1)
+set(VULKAN_MIN_VERSION_MINOR 3)
+set(VULKAN_MIN_VERSION_PATCH 268)
+set(VULKAN_MIN_VERSION "${VULKAN_MIN_VERSION_MAJOR}.${VULKAN_MIN_VERSION_MINOR}.${VULKAN_MIN_VERSION_PATCH}.0")
+
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
 include(ForceColoredOutput)
@@ -28,7 +33,7 @@ find_package(imgui CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(strong_type CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
-find_package(Vulkan 1.3.268.0 MODULE REQUIRED COMPONENTS glslang)
+find_package(Vulkan ${VULKAN_MIN_VERSION} MODULE REQUIRED COMPONENTS glslang)
 
 # Build ImGui
 add_library(imgui
@@ -64,13 +69,14 @@ target_link_libraries(pch
 )
 
 # Build main application
+configure_file(src/VkIgnite/Version.hpp.in Version.hpp @ONLY)
 add_executable(helloworld
     src/main.cpp
     src/VkIgnite/Wsi/Glfw.cpp
     src/VkIgnite/VkIgnite.cpp
     src/VkIgnite/Shader.cpp
 )
-target_include_directories(helloworld PRIVATE src)
+target_include_directories(helloworld PRIVATE src "${CMAKE_CURRENT_BINARY_DIR}")
 if(CMAKE_CXX_COMPILER_ID MATCHES Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
     target_compile_options(helloworld
         PRIVATE

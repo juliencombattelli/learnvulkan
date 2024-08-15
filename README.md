@@ -129,7 +129,7 @@ TODO
 
 - [x] Define a custom minimal FindVulkan based on CMake's one
       => Not really minimal, but functionnal
-- [ ] Define the Vulkan min version once in CMake and propagate it anywhere needed
+- [x] Define the Vulkan min version once in CMake and propagate it anywhere needed
 - [ ] For native builds, require the SDK to be installed
 - [ ] For cross compile builds, requires SDK for target system to be installed
 

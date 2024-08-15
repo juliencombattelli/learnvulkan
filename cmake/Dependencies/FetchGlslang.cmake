@@ -3,11 +3,11 @@ cmake_minimum_required(VERSION 3.24)
 
 include(FetchContent)
 
-message(CHECK_START "Fetching and configuring glslang vulkan-sdk-1.3.268.0")
+message(CHECK_START "Fetching and configuring glslang vulkan-sdk-${VULKAN_MIN_VERSION}")
 FetchContent_Declare(
     glslang
     GIT_REPOSITORY https://github.com/KhronosGroup/glslang
-    GIT_TAG vulkan-sdk-1.3.268.0
+    GIT_TAG vulkan-sdk-${VULKAN_MIN_VERSION}
     GIT_SHALLOW ON
     OVERRIDE_FIND_PACKAGE
 )

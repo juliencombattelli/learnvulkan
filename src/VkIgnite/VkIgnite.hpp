@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Version.hpp"
+
 #include <strong_type/strong_type.hpp>
 
 #include "vulkan.hpp"
@@ -78,7 +80,12 @@ struct ApplicationInfo {
     Version applicationVersion = {};
     std::string engineName = {};
     Version engineVersion = {};
-    ApiVersion vkApiVersion { 0, 1, 3, 268 };
+    ApiVersion vkApiVersion {
+        0,
+        VULKAN_MIN_VERSION_MAJOR,
+        VULKAN_MIN_VERSION_MINOR,
+        VULKAN_MIN_VERSION_PATCH,
+    };
 };
 
 struct InstanceCreateInfo {

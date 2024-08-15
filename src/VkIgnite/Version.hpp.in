@@ -1,0 +1,9 @@
+#pragma once
+
+#include <stdint.h>
+
+// clang-format off: @VAR@ are special tokens replaced by CMake
+constexpr uint32_t VULKAN_MIN_VERSION_MAJOR = @VULKAN_MIN_VERSION_MAJOR@;
+constexpr uint32_t VULKAN_MIN_VERSION_MINOR = @VULKAN_MIN_VERSION_MINOR@;
+constexpr uint32_t VULKAN_MIN_VERSION_PATCH = @VULKAN_MIN_VERSION_PATCH@;
+// clang-format on
