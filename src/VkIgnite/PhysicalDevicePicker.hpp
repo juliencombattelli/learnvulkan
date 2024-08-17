@@ -199,7 +199,8 @@ private:
         const vk::SurfaceKHR& surface,
         std::span<vki::ExtensionName> requiredDeviceExtensions)
     {
-        std::string_view deviceName = physicalDevice.getProperties().deviceName;
+        vk::PhysicalDeviceProperties properties = physicalDevice.getProperties();
+        std::string_view deviceName = properties.deviceName;
 
         spdlog::debug("Checking if physical device {} is compatible", deviceName);
 
