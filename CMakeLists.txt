@@ -33,7 +33,11 @@ find_package(imgui CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(strong_type CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
-find_package(Vulkan ${VULKAN_MIN_VERSION} MODULE REQUIRED COMPONENTS glslang)
+find_package(Vulkan ${VULKAN_MIN_VERSION} MODULE
+    REQUIRED
+    COMPONENTS
+        glslang glslang-spirv SPIRV-Tools SPIRV-Tools-opt
+)
 
 # Build ImGui
 add_library(imgui
