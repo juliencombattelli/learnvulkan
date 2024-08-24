@@ -26,6 +26,8 @@ struct ApplicationInfo {
     ApiVersion vkApiVersion = ApiVersion::minimumRequired();
 };
 
+using DebugUtilsMessengerCallback = PFN_vkDebugUtilsMessengerCallbackEXT;
+
 struct InstanceCreateInfo {
     ApplicationInfo applicationInfo = {};
     // List of layers to enable
@@ -36,11 +38,21 @@ struct InstanceCreateInfo {
     Option validationLayerKHROption = Option::Disabled;
     // Whether to enable the debug utils extension
     Option debugUtilsMessengerEXTOption = Option::Disabled;
+    // Debug messenger callback, nullptr to use the engine's default one
+    DebugUtilsMessengerCallback debugUtilsMessengerCallback = nullptr;
+    // Debug messenger user data pointer, nullptr if not used
+    void* debugUtilsMessengerUserData = nullptr;
 };
 
-[[nodiscard]] vk::UniqueInstance makeInstanceUnique(InstanceCreateInfo instanceCreateInfo);
+class Instance {
+public:
+    [[nodiscard]] static Instance make(
+        const InstanceCreateInfo& instanceCreateInfo,
+        std::optional<vk::AllocationCallbacks> allocationCb = std::nullopt);
 
-[[nodiscard]] vk::UniqueDebugUtilsMessengerEXT makeDefaultDebugUtilsMessengerEXTUnique(
-    vk::Instance instance);
+    vk::UniqueInstance instance;
+    std::optional<vk::AllocationCallbacks> allocationCallbacks;
+    vk::UniqueDebugUtilsMessengerEXT debugUtilsMessengerEXT;
+};
 
 } // namespace vki

@@ -98,9 +98,7 @@ private:
 
     void initVulkan()
     {
-        VULKAN_HPP_DEFAULT_DISPATCHER.init();
-
-        instance_ = vki::makeInstanceUnique(vki::InstanceCreateInfo {
+        instance_ = vki::Instance::make(vki::InstanceCreateInfo {
             .applicationInfo = {
                 .applicationName = "",
                 .applicationVersion = vki::makeVersion(0, 1, 0),
@@ -113,20 +111,16 @@ private:
             .debugUtilsMessengerEXTOption = vki::Option::Enabled,
         });
 
-        VULKAN_HPP_DEFAULT_DISPATCHER.init(*instance_);
-
-        if (EnableValidationLayers) {
-            debugMessenger_ = vki::makeDefaultDebugUtilsMessengerEXTUnique(*instance_);
-        }
-
-        surface_ = vki::wsi::glfw::createSurfaceKHRUnique(*instance_, window_);
+        surface_ = vki::wsi::glfw::createSurfaceKHRUnique(*instance_.instance, window_);
 
         std::vector<vki::ExtensionName> requiredDeviceExtensions {
             VK_KHR_SWAPCHAIN_EXTENSION_NAME
         };
 
-        vki::PhysicalDevicePickResult physicalDevicePickResult
-            = vki::PhysicalDevicePicker::pick(*instance_, *surface_, requiredDeviceExtensions);
+        vki::PhysicalDevicePickResult physicalDevicePickResult = vki::PhysicalDevicePicker::pick(
+            *instance_.instance,
+            *surface_,
+            requiredDeviceExtensions);
 
         physicalDevice_ = physicalDevicePickResult.physicalDevice;
 
@@ -697,8 +691,7 @@ private:
 
     GLFWwindow* window_;
 
-    vk::UniqueInstance instance_;
-    vk::UniqueDebugUtilsMessengerEXT debugMessenger_;
+    vki::Instance instance_;
 
     vk::UniqueSurfaceKHR surface_;
     vk::PhysicalDevice physicalDevice_;
