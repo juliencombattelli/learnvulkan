@@ -3,7 +3,7 @@
 #include "VkIgnite/VkIgnite.hpp"
 #include "VkIgnite/Wsi/Glfw.hpp"
 
-#include "spdlog/spdlog.h"
+#include "Pch/Spdlog.hpp"
 
 #include "Stdx/Algorithm.hpp"
 
@@ -56,8 +56,6 @@ void main() {
     outColor = vec4(fragColor, 1.0);
 }
 )fragmentShader";
-
-VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE;
 
 class HelloTriangleApplication {
 public:

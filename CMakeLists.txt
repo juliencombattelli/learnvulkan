@@ -55,13 +55,13 @@ target_link_libraries(imgui
 
 # Build precompiled headers
 add_library(pch INTERFACE)
-target_include_directories(pch INTERFACE src/Pch)
+target_include_directories(pch INTERFACE src)
 target_precompile_headers(pch
     INTERFACE
-        src/Pch/glfw.hpp
-        src/Pch/glm.hpp
-        src/Pch/spdlog.hpp
-        src/Pch/vulkan.hpp
+        src/Pch/Glfw.hpp
+        src/Pch/Glm.hpp
+        src/Pch/Spdlog.hpp
+        src/Pch/Vulkan.hpp
 )
 target_link_libraries(pch
     INTERFACE
@@ -73,12 +73,13 @@ target_link_libraries(pch
 )
 
 # Build main application
-configure_file(src/VkIgnite/Version.hpp.in Version.hpp @ONLY)
+configure_file(src/VkIgnite/MinVkVersion.hpp.in MinVkVersion.hpp @ONLY)
 add_executable(helloworld
     src/main.cpp
     src/VkIgnite/Wsi/Glfw.cpp
     src/VkIgnite/VkIgnite.cpp
     src/VkIgnite/Shader.cpp
+    src/VkIgnite/Instance.cpp
 )
 target_include_directories(helloworld PRIVATE src "${CMAKE_CURRENT_BINARY_DIR}")
 if(CMAKE_CXX_COMPILER_ID MATCHES Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
