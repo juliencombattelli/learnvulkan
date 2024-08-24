@@ -113,36 +113,41 @@ namespace vki {
     });
 }
 
-[[nodiscard]] vk::UniqueDebugUtilsMessengerEXT makeDefaultDebugUtilsMessengerEXTUnique(
+[[nodiscard]] vk::UniqueDebugUtilsMessengerEXT makeDebugUtilsMessengerEXTUnique(
     vk::Instance instance,
-    DebugUtilsMessengerCallback debugUtilsMessengerCb,
-    void* debugUtilsMessengerUserData)
+    std::optional<DebugUtilsMessengerCallback> debugUtilsMessengerCb)
 {
-    if (debugUtilsMessengerCb == nullptr) {
-        debugUtilsMessengerCb = defaultDebugCallback;
-    }
-
-    vk::DebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo {
-        .messageSeverity =
-            []() {
-                using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
-                return eVerbose | eInfo | eWarning | eError;
-            }(),
-        .messageType =
-            []() {
-                using enum vk::DebugUtilsMessageTypeFlagBitsEXT;
-                return eGeneral | eValidation | ePerformance;
-            }(),
-        .pfnUserCallback = debugUtilsMessengerCb,
-        .pUserData = debugUtilsMessengerUserData,
-    };
+    vk::DebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo = [&] {
+        if (debugUtilsMessengerCb == std::nullopt) {
+            // Use the default debug utils messenger if the user provided none
+            return vk::DebugUtilsMessengerCreateInfoEXT {
+                .messageSeverity =
+                    []() {
+                        using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
+                        return eVerbose | eInfo | eWarning | eError;
+                    }(),
+                .messageType =
+                    []() {
+                        using enum vk::DebugUtilsMessageTypeFlagBitsEXT;
+                        return eGeneral | eValidation | ePerformance;
+                    }(),
+                .pfnUserCallback = defaultDebugCallback,
+                .pUserData = nullptr,
+            };
+        } else {
+            return vk::DebugUtilsMessengerCreateInfoEXT {
+                .messageSeverity = debugUtilsMessengerCb->messageSeverity,
+                .messageType = debugUtilsMessengerCb->messageType,
+                .pfnUserCallback = debugUtilsMessengerCb->callback,
+                .pUserData = debugUtilsMessengerCb->userData,
+            };
+        }
+    }();
 
     return instance.createDebugUtilsMessengerEXTUnique(debugMessengerCreateInfo);
 }
 
-[[nodiscard]] Instance Instance::make(
-    const InstanceCreateInfo& instanceCreateInfo,
-    std::optional<vk::AllocationCallbacks> allocationCb)
+[[nodiscard]] Instance Instance::make(const InstanceCreateInfo& instanceCreateInfo)
 {
     VULKAN_HPP_DEFAULT_DISPATCHER.init();
 
@@ -152,15 +157,14 @@ namespace vki {
 
     vk::UniqueDebugUtilsMessengerEXT debugMessenger;
     if (instanceCreateInfo.debugUtilsMessengerEXTOption == Option::Enabled) {
-        debugMessenger = vki::makeDefaultDebugUtilsMessengerEXTUnique(
+        debugMessenger = vki::makeDebugUtilsMessengerEXTUnique(
             *instance,
-            instanceCreateInfo.debugUtilsMessengerCallback,
-            instanceCreateInfo.debugUtilsMessengerUserData);
+            instanceCreateInfo.debugUtilsMessengerCallback);
     }
 
     return {
         .instance = std::move(instance),
-        .allocationCallbacks = allocationCb,
+        .allocationCallbacks = instanceCreateInfo.allocationCallbacks,
         .debugUtilsMessengerEXT = std::move(debugMessenger),
     };
 }

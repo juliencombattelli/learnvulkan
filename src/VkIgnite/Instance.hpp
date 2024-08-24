@@ -26,7 +26,12 @@ struct ApplicationInfo {
     ApiVersion vkApiVersion = ApiVersion::minimumRequired();
 };
 
-using DebugUtilsMessengerCallback = PFN_vkDebugUtilsMessengerCallbackEXT;
+struct DebugUtilsMessengerCallback {
+    vk::DebugUtilsMessageSeverityFlagsEXT messageSeverity;
+    vk::DebugUtilsMessageTypeFlagsEXT messageType;
+    PFN_vkDebugUtilsMessengerCallbackEXT callback;
+    void* userData;
+};
 
 struct InstanceCreateInfo {
     ApplicationInfo applicationInfo = {};
@@ -38,17 +43,15 @@ struct InstanceCreateInfo {
     Option validationLayerKHROption = Option::Disabled;
     // Whether to enable the debug utils extension
     Option debugUtilsMessengerEXTOption = Option::Disabled;
-    // Debug messenger callback, nullptr to use the engine's default one
-    DebugUtilsMessengerCallback debugUtilsMessengerCallback = nullptr;
-    // Debug messenger user data pointer, nullptr if not used
-    void* debugUtilsMessengerUserData = nullptr;
+    // Debug messenger callback, or nullopt to use the engine's default one
+    std::optional<DebugUtilsMessengerCallback> debugUtilsMessengerCallback = std::nullopt;
+    // Allocation callback, or nullopt if not used
+    std::optional<vk::AllocationCallbacks> allocationCallbacks = std::nullopt;
 };
 
 class Instance {
 public:
-    [[nodiscard]] static Instance make(
-        const InstanceCreateInfo& instanceCreateInfo,
-        std::optional<vk::AllocationCallbacks> allocationCb = std::nullopt);
+    [[nodiscard]] static Instance make(const InstanceCreateInfo& instanceCreateInfo);
 
     vk::UniqueInstance instance;
     std::optional<vk::AllocationCallbacks> allocationCallbacks;
