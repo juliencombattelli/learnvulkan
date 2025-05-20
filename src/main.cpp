@@ -111,14 +111,14 @@ private:
             .debugUtilsMessengerEXTOption = vki::Option::Enabled,
         });
 
-        surface_ = vki::wsi::glfw::createSurfaceKHRUnique(*instance_.instance, window_);
+        surface_ = vki::wsi::glfw::createSurfaceKHRUnique(*instance_.handle, window_);
 
         std::vector<vki::ExtensionName> requiredDeviceExtensions {
             VK_KHR_SWAPCHAIN_EXTENSION_NAME
         };
 
         vki::PhysicalDevicePickResult physicalDevicePickResult = vki::PhysicalDevicePicker::pick(
-            *instance_.instance,
+            *instance_.handle,
             *surface_,
             requiredDeviceExtensions);
 

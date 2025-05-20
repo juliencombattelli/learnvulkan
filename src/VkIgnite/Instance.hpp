@@ -5,8 +5,6 @@
 
 #include "Pch/Vulkan.hpp"
 
-#include <strong_type/strong_type.hpp>
-
 #include <string>
 #include <vector>
 
@@ -35,9 +33,9 @@ struct DebugUtilsMessengerCallback {
 
 struct InstanceCreateInfo {
     ApplicationInfo applicationInfo = {};
-    // List of layers to enable
+    // List of instance layers to enable
     std::vector<LayerName> enabledLayerNames = {};
-    // List of extensions to enable
+    // List of instance extensions to enable
     std::vector<ExtensionName> enabledExtensionNames = {};
     // Whether to enable the validation layer from Khronos
     Option validationLayerKHROption = Option::Disabled;
@@ -53,7 +51,7 @@ class Instance {
 public:
     [[nodiscard]] static Instance make(const InstanceCreateInfo& instanceCreateInfo);
 
-    vk::UniqueInstance instance;
+    vk::UniqueInstance handle;
     std::optional<vk::AllocationCallbacks> allocationCallbacks;
     vk::UniqueDebugUtilsMessengerEXT debugUtilsMessengerEXT;
 };

@@ -66,7 +66,7 @@ namespace vki {
     return false;
 }
 
-[[nodiscard]] vk::UniqueInstance makeInstanceUnique(InstanceCreateInfo instanceCreateInfo)
+[[nodiscard]] static vk::UniqueInstance makeInstanceUnique(InstanceCreateInfo instanceCreateInfo)
 {
     vk::ApplicationInfo appInfo {
         .pApplicationName = instanceCreateInfo.applicationInfo.applicationName.c_str(),
@@ -113,7 +113,7 @@ namespace vki {
     });
 }
 
-[[nodiscard]] vk::UniqueDebugUtilsMessengerEXT makeDebugUtilsMessengerEXTUnique(
+[[nodiscard]] static vk::UniqueDebugUtilsMessengerEXT makeDebugUtilsMessengerEXTUnique(
     vk::Instance instance,
     std::optional<DebugUtilsMessengerCallback> debugUtilsMessengerCb)
 {
@@ -163,7 +163,7 @@ namespace vki {
     }
 
     return {
-        .instance = std::move(instance),
+        .handle = std::move(instance),
         .allocationCallbacks = instanceCreateInfo.allocationCallbacks,
         .debugUtilsMessengerEXT = std::move(debugMessenger),
     };
